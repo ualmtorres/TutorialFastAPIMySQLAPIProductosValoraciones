@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.22">
+<meta name="author" content="Departamento de Informática. Manuel Torres &lt;mtorres@ual.es&gt;">
+<title>Desarrollo de una API REST para gestión de productos y valoraciones con FastAPI y MySQL</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<style>
+/*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
+/* Uncomment the following line when using as a custom stylesheet */
+/* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"; */
+html{font-family:sans-serif;-webkit-text-size-adjust:100%}
+a{background:none}
+a:focus{outline:thin dotted}
+a:active,a:hover{outline:0}
+h1{font-size:2em;margin:.67em 0}
+b,strong{font-weight:bold}
+abbr{font-size:.9em}
+abbr[title]{cursor:help;border-bottom:1px dotted #dddddf;text-decoration:none}
+dfn{font-style:italic}
+hr{height:0}
+mark{background:#ff0;color:#000}
+code,kbd,pre,samp{font-family:monospace;font-size:1em}
+pre{white-space:pre-wrap}
+q{quotes:"\201C" "\201D" "\2018" "\2019"}
+small{font-size:80%}
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+sup{top:-.5em}
+sub{bottom:-.25em}
+img{border:0}
+svg:not(:root){overflow:hidden}
+figure{margin:0}
+audio,video{display:inline-block}
+audio:not([controls]){display:none;height:0}
+fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
+legend{border:0;padding:0}
+button,input,select,textarea{font-family:inherit;font-size:100%;margin:0}
+button,input{line-height:normal}
+button,select{text-transform:none}
+button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}
+button[disabled],html input[disabled]{cursor:default}
+input[type=checkbox],input[type=radio]{padding:0}
+button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
+textarea{overflow:auto;vertical-align:top}
+table{border-collapse:collapse;border-spacing:0}
+*,::before,::after{box-sizing:border-box}
+html,body{font-size:100%}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;line-height:1;position:relative;cursor:auto;-moz-tab-size:4;-o-tab-size:4;tab-size:4;word-wrap:anywhere;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
+a:hover{cursor:pointer}
+img,object,embed{max-width:100%;height:auto}
+object,embed{height:100%}
+img{-ms-interpolation-mode:bicubic}
+.left{float:left!important}
+.right{float:right!important}
+.text-left{text-align:left!important}
+.text-right{text-align:right!important}
+.text-center{text-align:center!important}
+.text-justify{text-align:justify!important}
+.hide{display:none}
+img,object,svg{display:inline-block;vertical-align:middle}
+textarea{height:auto;min-height:50px}
+select{width:100%}
+.subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0}
+a{color:#2156a5;text-decoration:underline;line-height:inherit}
+a:hover,a:focus{color:#1d4b8f}
+a img{border:0}
+p{line-height:1.6;margin-bottom:1.25em;text-rendering:optimizeLegibility}
+p aside{font-size:.875em;line-height:1.35;font-style:italic}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
+h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#e99b8f;line-height:0}
+h1{font-size:2.125em}
+h2{font-size:1.6875em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.375em}
+h4,h5{font-size:1.125em}
+h6{font-size:1em}
+hr{border:solid #dddddf;border-width:1px 0 0;clear:both;margin:1.25em 0 1.1875em}
+em,i{font-style:italic;line-height:inherit}
+strong,b{font-weight:bold;line-height:inherit}
+small{font-size:60%;line-height:inherit}
+code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;color:rgba(0,0,0,.9)}
+ul,ol,dl{line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
+ul,ol{margin-left:1.5em}
+ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0}
+ul.circle{list-style-type:circle}
+ul.disc{list-style-type:disc}
+ul.square{list-style-type:square}
+ul.circle ul:not([class]),ul.disc ul:not([class]),ul.square ul:not([class]){list-style:inherit}
+ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
+dl dt{margin-bottom:.3125em;font-weight:bold}
+dl dd{margin-bottom:1.25em}
+blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
+blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
+@media screen and (min-width:768px){h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2}
+h1{font-size:2.75em}
+h2{font-size:2.3125em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
+h4{font-size:1.4375em}}
+table{background:#fff;margin-bottom:1.25em;border:1px solid #dedede;word-wrap:normal}
+table thead,table tfoot{background:#f7f8f7}
+table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
+table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
+table tr.even,table tr.alt{background:#f8f8f7}
+table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{line-height:1.6}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
+h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
+.center{margin-left:auto;margin-right:auto}
+.stretch{width:100%}
+.clearfix::before,.clearfix::after,.float-group::before,.float-group::after{content:" ";display:table}
+.clearfix::after,.float-group::after{clear:both}
+:not(pre).nobreak{word-wrap:normal}
+:not(pre).nowrap{white-space:nowrap}
+:not(pre).pre-wrap{white-space:pre-wrap}
+:not(pre):not([class^=L])>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background:#f7f7f8;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+pre{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;line-height:1.45;text-rendering:optimizeSpeed}
+pre code,pre pre{color:inherit;font-size:inherit;line-height:inherit}
+pre>code{display:block}
+pre.nowrap,pre.nowrap pre{white-space:pre;word-wrap:normal}
+em em{font-style:normal}
+strong strong{font-weight:400}
+.keyseq{color:rgba(51,51,51,.8)}
+kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background:#f7f7f7;border:1px solid #ccc;border-radius:3px;box-shadow:0 1px 0 rgba(0,0,0,.2),inset 0 0 0 .1em #fff;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
+.keyseq kbd:first-child{margin-left:0}
+.keyseq kbd:last-child{margin-right:0}
+.menuseq,.menuref{color:#000}
+.menuseq b:not(.caret),.menuref{font-weight:inherit}
+.menuseq{word-spacing:-.02em}
+.menuseq b.caret{font-size:1.25em;line-height:.8}
+.menuseq i.caret{font-weight:bold;text-align:center;width:.45em}
+b.button::before,b.button::after{position:relative;top:-1px;font-weight:400}
+b.button::before{content:"[";padding:0 3px 0 2px}
+b.button::after{content:"]";padding:0 2px 0 3px}
+p a>code:hover{color:rgba(0,0,0,.9)}
+#header,#content,#footnotes,#footer{width:100%;margin:0 auto;max-width:62.5em;*zoom:1;position:relative;padding-left:.9375em;padding-right:.9375em}
+#header::before,#header::after,#content::before,#content::after,#footnotes::before,#footnotes::after,#footer::before,#footer::after{content:" ";display:table}
+#header::after,#content::after,#footnotes::after,#footer::after{clear:both}
+#content{margin-top:1.25em}
+#content::before{content:none}
+#header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
+#header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #dddddf}
+#header>h1:only-child{border-bottom:1px solid #dddddf;padding-bottom:8px}
+#header .details{border-bottom:1px solid #dddddf;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:flex;flex-flow:row wrap}
+#header .details span:first-child{margin-left:-.125em}
+#header .details span.email a{color:rgba(0,0,0,.85)}
+#header .details br{display:none}
+#header .details br+span::before{content:"\00a0\2013\00a0"}
+#header .details br+span.author::before{content:"\00a0\22c5\00a0";color:rgba(0,0,0,.85)}
+#header .details br+span#revremark::before{content:"\00a0|\00a0"}
+#header #revnumber{text-transform:capitalize}
+#header #revnumber::after{content:"\00a0"}
+#content>h1:first-child:not([class]){color:rgba(0,0,0,.85);border-bottom:1px solid #dddddf;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
+#toc{border-bottom:1px solid #e7e7e9;padding-bottom:.5em}
+#toc>ul{margin-left:.125em}
+#toc ul.sectlevel0>li>a{font-style:italic}
+#toc ul.sectlevel0 ul.sectlevel1{margin:.5em 0}
+#toc ul{font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none}
+#toc li{line-height:1.3334;margin-top:.3334em}
+#toc a{text-decoration:none}
+#toc a:active{text-decoration:underline}
+#toctitle{color:#7a2518;font-size:1.2em}
+@media screen and (min-width:768px){#toctitle{font-size:1.375em}
+body.toc2{padding-left:15em;padding-right:0}
+body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #dddddf;padding-bottom:8px}
+#toc.toc2{margin-top:0!important;background:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #e7e7e9;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
+#toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+#toc.toc2>ul{font-size:.9em;margin-bottom:0}
+#toc.toc2 ul ul{margin-left:0;padding-left:1em}
+#toc.toc2 ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+body.toc2.toc-right{padding-left:0;padding-right:15em}
+body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #e7e7e9;left:auto;right:0}}
+@media screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
+#toc.toc2{width:20em}
+#toc.toc2 #toctitle{font-size:1.375em}
+#toc.toc2>ul{font-size:.95em}
+#toc.toc2 ul ul{padding-left:1.25em}
+body.toc2.toc-right{padding-left:0;padding-right:20em}}
+#content #toc{border:1px solid #e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;border-radius:4px}
+#content #toc>:first-child{margin-top:0}
+#content #toc>:last-child{margin-bottom:0}
+#footer{max-width:none;background:rgba(0,0,0,.8);padding:1.25em}
+#footer-text{color:hsla(0,0%,100%,.8);line-height:1.44}
+#content{margin-bottom:.625em}
+.sect1{padding-bottom:.625em}
+@media screen and (min-width:768px){#content{margin-bottom:1.25em}
+.sect1{padding-bottom:1.25em}}
+.sect1:last-child{padding-bottom:0}
+.sect1+.sect1{border-top:1px solid #e7e7e9}
+#content h1>a.anchor,h2>a.anchor,h3>a.anchor,#toctitle>a.anchor,.sidebarblock>.content>.title>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor{position:absolute;z-index:1001;width:1.5ex;margin-left:-1.5ex;display:block;text-decoration:none!important;visibility:hidden;text-align:center;font-weight:400}
+#content h1>a.anchor::before,h2>a.anchor::before,h3>a.anchor::before,#toctitle>a.anchor::before,.sidebarblock>.content>.title>a.anchor::before,h4>a.anchor::before,h5>a.anchor::before,h6>a.anchor::before{content:"\00A7";font-size:.85em;display:block;padding-top:.1em}
+#content h1:hover>a.anchor,#content h1>a.anchor:hover,h2:hover>a.anchor,h2>a.anchor:hover,h3:hover>a.anchor,#toctitle:hover>a.anchor,.sidebarblock>.content>.title:hover>a.anchor,h3>a.anchor:hover,#toctitle>a.anchor:hover,.sidebarblock>.content>.title>a.anchor:hover,h4:hover>a.anchor,h4>a.anchor:hover,h5:hover>a.anchor,h5>a.anchor:hover,h6:hover>a.anchor,h6>a.anchor:hover{visibility:visible}
+#content h1>a.link,h2>a.link,h3>a.link,#toctitle>a.link,.sidebarblock>.content>.title>a.link,h4>a.link,h5>a.link,h6>a.link{color:#ba3925;text-decoration:none}
+#content h1>a.link:hover,h2>a.link:hover,h3>a.link:hover,#toctitle>a.link:hover,.sidebarblock>.content>.title>a.link:hover,h4>a.link:hover,h5>a.link:hover,h6>a.link:hover{color:#a53221}
+details,.audioblock,.imageblock,.literalblock,.listingblock,.stemblock,.videoblock{margin-bottom:1.25em}
+details{margin-left:1.25rem}
+details>summary{cursor:pointer;display:block;position:relative;line-height:1.6;margin-bottom:.625rem;outline:none;-webkit-tap-highlight-color:transparent}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"";border:solid transparent;border-left:solid;border-width:.3em 0 .3em .5em;position:absolute;top:.5em;left:-1.25rem;transform:translateX(15%)}
+details[open]>summary::before{border:solid transparent;border-top:solid;border-width:.5em .3em 0;transform:translateY(15%)}
+details>summary::after{content:"";width:1.25rem;height:1em;position:absolute;top:.3em;left:-1.25rem}
+.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{text-rendering:optimizeLegibility;text-align:left;font-family:"Noto Serif","DejaVu Serif",serif;font-size:1rem;font-style:italic}
+table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
+.paragraph.lead>p,#preamble>.sectionbody>[class=paragraph]:first-of-type p{font-size:1.21875em;line-height:1.6;color:rgba(0,0,0,.85)}
+.admonitionblock>table{border-collapse:separate;border:0;background:none;width:100%}
+.admonitionblock>table td.icon{text-align:center;width:80px}
+.admonitionblock>table td.icon img{max-width:none}
+.admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
+.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6);word-wrap:anywhere}
+.admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content{border:1px solid #e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;border-radius:4px}
+.sidebarblock{border:1px solid #dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;border-radius:4px}
+.sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
+.exampleblock>.content>:first-child,.sidebarblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child,.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.literalblock pre,.listingblock>.content>pre{border-radius:4px;overflow-x:auto;padding:1em;font-size:.8125em}
+@media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
+@media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
+.literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class=highlight],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
+.literalblock.output pre{color:#f7f7f8;background:rgba(0,0,0,.9)}
+.listingblock>.content{position:relative}
+.listingblock code[data-lang]::before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.425rem;right:.5rem;line-height:1;text-transform:uppercase;color:inherit;opacity:.5}
+.listingblock:hover code[data-lang]::before{display:block}
+.listingblock.terminal pre .command::before{content:attr(data-prompt);padding-right:.5em;color:inherit;opacity:.5}
+.listingblock.terminal pre .command:not([data-prompt])::before{content:"$"}
+.listingblock pre.highlightjs{padding:0}
+.listingblock pre.highlightjs>code{padding:1em;border-radius:4px}
+.listingblock pre.prettyprint{border-width:0}
+.prettyprint{background:#f7f7f8}
+pre.prettyprint .linenums{line-height:1.45;margin-left:2em}
+pre.prettyprint li{background:none;list-style-type:inherit;padding-left:0}
+pre.prettyprint li code[data-lang]::before{opacity:1}
+pre.prettyprint li:not(:first-child) code[data-lang]::before{display:none}
+table.linenotable{border-collapse:separate;border:0;margin-bottom:0;background:none}
+table.linenotable td[class]{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
+table.linenotable td.code{padding-left:.75em}
+table.linenotable td.linenos,pre.pygments .linenos{border-right:1px solid;opacity:.35;padding-right:.5em;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+pre.pygments span.linenos{display:inline-block;margin-right:.75em}
+.quoteblock{margin:0 1em 1.25em 1.5em;display:table}
+.quoteblock:not(.excerpt)>.title{margin-left:-1.5em;margin-bottom:.75em}
+.quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
+.quoteblock blockquote{margin:0;padding:0;border:0}
+.quoteblock blockquote::before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
+.quoteblock .attribution{margin-top:.75em;margin-right:.5ex;text-align:right}
+.verseblock{margin:0 1em 1.25em}
+.verseblock pre{font-family:"Open Sans","DejaVu Sans",sans-serif;font-size:1.15rem;color:rgba(0,0,0,.85);font-weight:300;text-rendering:optimizeLegibility}
+.verseblock pre strong{font-weight:400}
+.verseblock .attribution{margin-top:1.25rem;margin-left:.5ex}
+.quoteblock .attribution,.verseblock .attribution{font-size:.9375em;line-height:1.45;font-style:italic}
+.quoteblock .attribution br,.verseblock .attribution br{display:none}
+.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
+.quoteblock.abstract blockquote::before,.quoteblock.excerpt blockquote::before,.quoteblock .quoteblock blockquote::before{display:none}
+.quoteblock.abstract blockquote,.quoteblock.abstract p,.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{line-height:1.6;word-spacing:0}
+.quoteblock.abstract{margin:0 1em 1.25em;display:block}
+.quoteblock.abstract>.title{margin:0 0 .375em;font-size:1.15em;text-align:center}
+.quoteblock.excerpt>blockquote,.quoteblock .quoteblock{padding:0 0 .25em 1em;border-left:.25em solid #dddddf}
+.quoteblock.excerpt,.quoteblock .quoteblock{margin-left:0}
+.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{color:inherit;font-size:1.0625rem}
+.quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;font-size:.85rem;text-align:left;margin-right:0}
+p.tableblock:last-child{margin-bottom:0}
+td.tableblock>.content{margin-bottom:1.25em;word-wrap:anywhere}
+td.tableblock>.content>:last-child{margin-bottom:-1.25em}
+table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
+table.grid-all>*>tr>*{border-width:1px}
+table.grid-cols>*>tr>*{border-width:0 1px}
+table.grid-rows>*>tr>*{border-width:1px 0}
+table.frame-all{border-width:1px}
+table.frame-ends{border-width:1px 0}
+table.frame-sides{border-width:0 1px}
+table.frame-none>colgroup+*>:first-child>*,table.frame-sides>colgroup+*>:first-child>*{border-top-width:0}
+table.frame-none>:last-child>:last-child>*,table.frame-sides>:last-child>:last-child>*{border-bottom-width:0}
+table.frame-none>*>tr>:first-child,table.frame-ends>*>tr>:first-child{border-left-width:0}
+table.frame-none>*>tr>:last-child,table.frame-ends>*>tr>:last-child{border-right-width:0}
+table.stripes-all>*>tr,table.stripes-odd>*>tr:nth-of-type(odd),table.stripes-even>*>tr:nth-of-type(even),table.stripes-hover>*>tr:hover{background:#f8f8f7}
+th.halign-left,td.halign-left{text-align:left}
+th.halign-right,td.halign-right{text-align:right}
+th.halign-center,td.halign-center{text-align:center}
+th.valign-top,td.valign-top{vertical-align:top}
+th.valign-bottom,td.valign-bottom{vertical-align:bottom}
+th.valign-middle,td.valign-middle{vertical-align:middle}
+table thead th,table tfoot th{font-weight:bold}
+tbody tr th{background:#f7f8f7}
+tbody tr th,tbody tr th p,tfoot tr th,tfoot tr th p{color:rgba(0,0,0,.8);font-weight:bold}
+p.tableblock>code:only-child{background:none;padding:0}
+p.tableblock{font-size:1em}
+ol{margin-left:1.75em}
+ul li ol{margin-left:1.5em}
+dl dd{margin-left:1.125em}
+dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
+li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
+ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}
+ul.no-bullet,ol.no-bullet,ol.unnumbered{margin-left:.625em}
+ul.unstyled,ol.unstyled{margin-left:0}
+li>p:empty:only-child::before{content:"";display:inline-block}
+ul.checklist>li>p:first-child{margin-left:-1em}
+ul.checklist>li>p:first-child>.fa-square-o:first-child,ul.checklist>li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
+ul.checklist>li>p:first-child>input[type=checkbox]:first-child{margin-right:.25em}
+ul.inline{display:flex;flex-flow:row wrap;list-style:none;margin:0 0 .625em -1.25em}
+ul.inline>li{margin-left:1.25em}
+.unstyled dl dt{font-weight:400;font-style:normal}
+ol.arabic{list-style-type:decimal}
+ol.decimal{list-style-type:decimal-leading-zero}
+ol.loweralpha{list-style-type:lower-alpha}
+ol.upperalpha{list-style-type:upper-alpha}
+ol.lowerroman{list-style-type:lower-roman}
+ol.upperroman{list-style-type:upper-roman}
+ol.lowergreek{list-style-type:lower-greek}
+.hdlist>table,.colist>table{border:0;background:none}
+.hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
+td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
+td.hdlist1{font-weight:bold;padding-bottom:1.25em}
+td.hdlist2{word-wrap:anywhere}
+.literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
+.colist td:not([class]):first-child{padding:.4em .75em 0;line-height:1;vertical-align:top}
+.colist td:not([class]):first-child img{max-width:none}
+.colist td:not([class]):last-child{padding:.25em 0}
+.thumb,.th{line-height:0;display:inline-block;border:4px solid #fff;box-shadow:0 0 0 1px #ddd}
+.imageblock.left{margin:.25em .625em 1.25em 0}
+.imageblock.right{margin:.25em 0 1.25em .625em}
+.imageblock>.title{margin-bottom:0}
+.imageblock.thumb,.imageblock.th{border-width:6px}
+.imageblock.thumb>.title,.imageblock.th>.title{padding:0 .125em}
+.image.left,.image.right{margin-top:.25em;margin-bottom:.25em;display:inline-block;line-height:0}
+.image.left{margin-right:.625em}
+.image.right{margin-left:.625em}
+a.image{text-decoration:none;display:inline-block}
+a.image object{pointer-events:none}
+sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
+sup.footnote a,sup.footnoteref a{text-decoration:none}
+sup.footnote a:active,sup.footnoteref a:active,#footnotes .footnote a:first-of-type:active{text-decoration:underline}
+#footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
+#footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em;border-width:1px 0 0}
+#footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;margin-bottom:.2em}
+#footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none;margin-left:-1.05em}
+#footnotes .footnote:last-of-type{margin-bottom:0}
+#content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
+div.unbreakable{page-break-inside:avoid}
+.big{font-size:larger}
+.small{font-size:smaller}
+.underline{text-decoration:underline}
+.overline{text-decoration:overline}
+.line-through{text-decoration:line-through}
+.aqua{color:#00bfbf}
+.aqua-background{background:#00fafa}
+.black{color:#000}
+.black-background{background:#000}
+.blue{color:#0000bf}
+.blue-background{background:#0000fa}
+.fuchsia{color:#bf00bf}
+.fuchsia-background{background:#fa00fa}
+.gray{color:#606060}
+.gray-background{background:#7d7d7d}
+.green{color:#006000}
+.green-background{background:#007d00}
+.lime{color:#00bf00}
+.lime-background{background:#00fa00}
+.maroon{color:#600000}
+.maroon-background{background:#7d0000}
+.navy{color:#000060}
+.navy-background{background:#00007d}
+.olive{color:#606000}
+.olive-background{background:#7d7d00}
+.purple{color:#600060}
+.purple-background{background:#7d007d}
+.red{color:#bf0000}
+.red-background{background:#fa0000}
+.silver{color:#909090}
+.silver-background{background:#bcbcbc}
+.teal{color:#006060}
+.teal-background{background:#007d7d}
+.white{color:#bfbfbf}
+.white-background{background:#fafafa}
+.yellow{color:#bfbf00}
+.yellow-background{background:#fafa00}
+span.icon>.fa{cursor:default}
+a span.icon>.fa{cursor:inherit}
+.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
+.admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
+.admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
+.admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
+.conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);border-radius:50%;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
+.conum[data-value] *{color:#fff!important}
+.conum[data-value]+b{display:none}
+.conum[data-value]::after{content:attr(data-value)}
+pre .conum[data-value]{position:relative;top:-.125em}
+b.conum *{color:inherit!important}
+.conum:not([data-value]):empty{display:none}
+dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
+h1,h2,p,td.content,span.alt,summary{letter-spacing:-.01em}
+p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
+p,blockquote,dt,td.content,td.hdlist1,span.alt,summary{font-size:1.0625rem}
+p{margin-bottom:1.25rem}
+.sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
+.exampleblock>.content{background:#fffef7;border-color:#e0e0dc;box-shadow:0 1px 4px #e0e0dc}
+.print-only{display:none!important}
+@page{margin:1.25cm .75cm}
+@media print{*{box-shadow:none!important;text-shadow:none!important}
+html{font-size:80%}
+a{color:inherit!important;text-decoration:underline!important}
+a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
+a[href^="http:"]:not(.bare)::after,a[href^="https:"]:not(.bare)::after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
+abbr[title]{border-bottom:1px dotted}
+abbr[title]::after{content:" (" attr(title) ")"}
+pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
+thead{display:table-header-group}
+svg{max-width:100%}
+p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
+h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
+#header,#content,#footnotes,#footer{max-width:none}
+#toc,.sidebarblock,.exampleblock>.content{background:none!important}
+#toc{border-bottom:1px solid #dddddf!important;padding-bottom:0!important}
+body.book #header{text-align:center}
+body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em}
+body.book #header .details{border:0!important;display:block;padding:0!important}
+body.book #header .details span:first-child{margin-left:0!important}
+body.book #header .details br{display:block}
+body.book #header .details br+span::before{content:none!important}
+body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
+body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
+.listingblock code[data-lang]::before{display:block}
+#footer{padding:0 .9375em}
+.hide-on-print{display:none!important}
+.print-only{display:block!important}
+.hide-for-print{display:none!important}
+.show-for-print{display:inherit!important}}
+@media amzn-kf8,print{#header>h1:first-child{margin-top:1.25rem}
+.sect1{padding:0!important}
+.sect1+.sect1{border:0}
+#footer{background:none}
+#footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
+@media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/styles/github.min.css">
+</head>
+<body class="book toc2 toc-right">
+<div id="header">
+<h1>Desarrollo de una API REST para gestión de productos y valoraciones con FastAPI y MySQL</h1>
+<div class="details">
+<span id="author" class="author">Departamento de Informática. Manuel Torres &lt;mtorres@ual.es&gt;</span><br>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Tabla de contenidos</div>
+<ul class="sectlevel1">
+<li><a href="#_resumen">Resumen</a></li>
+<li><a href="#_introducción">1. Introducción</a></li>
+<li><a href="#_descrición_del_problema">2. Descrición del problema</a></li>
+<li><a href="#_configuración_del_entorno_de_desarrollo">3. Configuración del entorno de desarrollo</a>
+<ul class="sectlevel2">
+<li><a href="#_servicios">3.1. Servicios</a></li>
+<li><a href="#_instrucciones_de_instalación">3.2. Instrucciones de instalación</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="images/di.png" alt="di">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_resumen">Resumen</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Este proyecto tiene como objetivo desarrollar una API REST eficiente y escalable para la gestión de productos y valoraciones en un entorno de comercio electrónico. Utilizando el framework FastAPI y MySQL, se busca proporcionar una solución flexible y robusta que permita a los desarrolladores crear aplicaciones modernas y de alto rendimiento. MySQL, con su capacidad de gestión de datos y su alto nivel de utilización en aplicaciones web, es una elección ideal para este tipo de proyectos. La implementación de esta API no solo facilitará la gestión de usuarios, productos y categorías, sino que también mejorará la experiencia del usuario al permitir la consulta y gestión de valoraciones y comentarios. Con un entorno de desarrollo configurado mediante Docker y Docker Compose, este proyecto ofrece una base sólida para futuras expansiones y mejoras. Con fines didácticos, se proporcionan ejemplos prácticos de uso de MySQL con Python y FastAPI, así como la interacción con la base de datos tanto mediante SQL directamente como a través de SQLAlchemy como ORM.</p>
+</div>
+<div class="ulist">
+<div class="title">Objetivos</div>
+<ul>
+<li>
+<p>Desarrollar una API REST utilizando el framework FastAPI y MySQL para gestionar usuarios, productos, categorías y valoraciones.</p>
+</li>
+<li>
+<p>Configurar un entorno de desarrollo utilizando Docker y Docker Compose.</p>
+</li>
+<li>
+<p>Implementar endpoints para la creación, consulta, actualización y eliminación de usuarios, productos, categorías y valoraciones.</p>
+</li>
+<li>
+<p>Proporcionar ejemplos prácticos de uso de MySQL con Python y FastAPI.</p>
+</li>
+<li>
+<p>Interactuar con la base de datos MySQL utilizando SQL directamente y mediante SQLAlchemy como ORM.</p>
+</li>
+<li>
+<p>Realizar pruebas de la API utilizando Postman.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Disponible el <a href="https://github.com/ualmtorres/FastAPIMySQLAPIProductosValoraciones.git">repositorio de GitHub</a> con el código fuente de la API REST.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introducción">1. Introducción</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>En el contexto del comercio electrónico, la experiencia del usuario no solo depende de la disponibilidad de productos, sino también de la calidad de la información y las opiniones de otros compradores. Las valoraciones y comentarios juegan un papel crucial en la toma de decisiones de los clientes, ayudando a generar confianza y a mejorar los productos ofrecidos.</p>
+</div>
+<div class="paragraph">
+<p>MySQL, como sistema de gestión de bases de datos relacional, ofrece una estructura robusta y eficiente para manejar datos estructurados, siendo una opción popular para aplicaciones web y comercio electrónico. En este tutorial se desarrollará una API REST que gestione usuarios, productos, categorías y valoraciones en un entorno de comercio electrónico.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_descrición_del_problema">2. Descrición del problema</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>En este proyecto se va a desarrollar una API REST utilizando MySQL para gestionar usuarios, productos, categorías y valoraciones en un entorno de comercio electrónico utilizando el framework de Python <a href="https://fastapi.tiangolo.com/">FastAPI</a> y MySQL. La API debe permitir:
+* La gestión de usuarios, incluyendo su creación, actualización, eliminación y consulta.
+* La gestión de productos, incluyendo su creación, actualización, eliminación y consulta.
+* La organización de productos en categorías con una estructura flexible.
+* La gestión de valoraciones y comentarios de los usuarios sobre los productos.
+* La consulta eficiente de productos con sus valoraciones agregadas.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configuración_del_entorno_de_desarrollo">3. Configuración del entorno de desarrollo</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Para configurar el entorno de desarrollo de la API REST, utilizaremos Docker y Docker Compose. El archivo <code>docker-compose.yml</code> define los servicios necesarios para ejecutar la aplicación, incluyendo MySQL y un contenedor de Python para ejecutar la API REST.</p>
+</div>
+<div class="paragraph">
+<p>A continuación se muestra el contenido del archivo <code>docker-compose.yml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">version: "3"
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - "../data/mysql-data:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  python:
+    depends_on:
+      mysql:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - "../:/app"
+    ports:
+      - "8000:8000"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Se utiliza un archivo <code>.env</code> para definir las variables de entorno necesarias para la configuración de MySQL. A continuación se muestra el contenido del archivo <code>.env</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">MYSQL_USER=example
+MYSQL_PASSWORD=example
+MYSQL_HOST=mysql
+MYSQL_DATABASE=mydatabase</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>El archivo <code>Dockefile</code> se utiliza para construir el contenedor de Python con las dependencias necesarias para ejecutar la API REST. A continuación se muestra el contenido del archivo <code>Dockerfile</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-docker hljs" data-lang="docker">FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY ./requirements.txt /tmp/requirements.txt
+
+RUN pip install -r /tmp/requirements.txt
+
+COPY ../ ./
+
+EXPOSE 8000
+
+CMD [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload" ]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Como archivo de requisitos, se utiliza <code>requirements.txt</code> para instalar las dependencias necesarias para la API REST. A continuación se muestra el contenido del archivo <code>requirements.txt</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">fastapi==0.95.2                 # Framework para construir APIs REST
+uvicorn==0.22.0                 # Servidor ASGI para ejecutar aplicaciones FastAPI
+sqlalchemy==2.0.23              # ORM para interactuar con bases de datos SQL
+mysql-connector-python==8.1.0   # Conector de MySQL para Python
+dotenv==0.9.9                   # Carga de variables de entorno desde un archivo .env
+pydantic==1.10.7                # Biblioteca de validación de datos y serialización de objetos
+pytz==2024.1                    # Biblioteca para manejar zonas horarias</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_servicios">3.1. Servicios</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>mysql</strong>: Servicio de bases de datos relacional que se utiliza para almacenar los usuarios, productos, categorías y valoraciones. Se expone con el nombre <code>mysql</code> en el puerto 3306 y utiliza un volumen para almacenar los datos de la base de datos que mapea el directorio <code>data/mysql-data</code> al directorio <code>/var/lib/mysql</code> en el contenedor. Se configura con un nombre de usuario, una contraseña y una base de datos iniciales para la autenticación y el acceso a los datos.</p>
+</li>
+<li>
+<p><strong>python</strong>: Contenedor de Python para ejecutar la API REST. Se construye a partir de un archivo <code>Dockerfile,</code> que instala las dependencias necesarias y expone el puerto 8000. Se monta la carpeta de la aplicación en el contenedor para facilitar el desarrollo.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_instrucciones_de_instalación">3.2. Instrucciones de instalación</h3>
+<div class="paragraph">
+<p>Para instalar y ejecutar la aplicación, sigue estos pasos:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Clona el repositorio:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone https://github.com/ualmtorres/FastAPIMySQLAPIProductosValoraciones.git
+cd FastAPIMySQLAPIProductosValoraciones</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Ejecuta Docker Compose para levantar los servicios:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose up -d</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Si necesitas volver a construir las imágenes de Docker (por ejemplo, si has realizado cambios en el archivo <code>Dockerfile</code>), puedes usar el siguiente comando:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose up -d --build</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Accede a la documentación de la API REST en <code><a href="http://localhost:8000/docs" class="bare">http://localhost:8000/docs</a></code> (Swagger) o <code><a href="http://localhost:8000/redoc" class="bare">http://localhost:8000/redoc</a></code> (Redoc).</p>
+</li>
+<li>
+<p>Accede a los endpoints de la API REST en <code><a href="http://localhost:8000/api" class="bare">http://localhost:8000/api</a></code>.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Con estos pasos, tendrás el entorno de desarrollo configurado y la API REST en funcionamiento.</p>
+</div>
+<div class="paragraph">
+<p>## Desarrollo de la API</p>
+</div>
+<div class="paragraph">
+<p>En esta sección vamos a crear la API REST para gestionar usuarios, productos, categorías y valoraciones utilizando el framework FastAPI y MySQL. Seguiremos un enfoque incremental, comenzando con la configuración general y luego desarrollando cada endpoint paso a paso. Antes, vamos a describir los endpoints disponibles en la API REST.</p>
+</div>
+<div class="paragraph">
+<p><mark>#</mark> Especificación de los endpoints de la API</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Usuarios</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>POST /api/users</code>: Crear un nuevo usuario.</p>
+</li>
+<li>
+<p><code>GET /api/users</code>: Obtener todos los usuarios. Parámetros opcionales de filtrado: <code>username</code> y <code>email</code></p>
+</li>
+<li>
+<p><code>GET /api/users/{id}</code>: Obtener un usuario por ID.</p>
+</li>
+<li>
+<p><code>PUT /api/users/{id}</code>: Actualizar un usuario por ID.</p>
+</li>
+<li>
+<p><code>DELETE /api/users/{id}</code>: Eliminar un usuario por ID. También se eliminan las valoraciones asociadas.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Productos</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>POST /api/products</code>: Crear un nuevo producto.</p>
+</li>
+<li>
+<p><code>GET /api/products</code>: Obtener todos los productos. Parámetros opcionales de filtrado: <code>categoryId</code> y <code>name</code></p>
+</li>
+<li>
+<p><code>GET /api/products/{id}</code>: Obtener un producto por ID.</p>
+</li>
+<li>
+<p><code>PUT /api/products/{id}</code>: Actualizar un producto por ID.</p>
+</li>
+<li>
+<p><code>DELETE /api/products/{id}</code>: Eliminar un producto por ID. También se eliminan los comentarios asociados.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Categorías</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>POST /api/categories</code>: Crear una nueva categoría.</p>
+</li>
+<li>
+<p><code>GET /api/categories</code>: Obtener todas las categorías.</p>
+</li>
+<li>
+<p><code>GET /api/categories/tree</code>: Obtener la jerarquía completa de categorías.</p>
+</li>
+<li>
+<p><code>GET /api/categories/{id}</code>: Obtener una categoría por ID.</p>
+</li>
+<li>
+<p><code>PUT /api/categories/{id}</code>: Actualizar una categoría por ID.</p>
+</li>
+<li>
+<p><code>DELETE /api/categories/{id}</code>: Eliminar una categoría por ID.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Comentarios</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>POST /api/reviews</code>: Añadir un comentario a un producto.</p>
+</li>
+<li>
+<p><code>GET /api/reviews</code>: Obtener todos los comentarios. Parámetros opcionales de filtrado: <code>productId</code> y <code>userId</code></p>
+</li>
+<li>
+<p><code>PUT /api/reviews/{id}</code>: Actualizar un comentario (solo por el usuario que lo creó).</p>
+</li>
+<li>
+<p><code>DELETE /api/reviews/{id}</code>: Eliminar un comentario por ID (solo por el usuario que lo creó).</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Ejemplo de JSON de un usuario</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+    "username": "usuario123",
+    "email": "usuario123@example.com"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Ejemplo de JSON de un producto</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+    "name": "Producto 1",
+    "description": "Descripción del producto 1",
+    "price": 100,
+    "categoryId": "60c72b2f9b1d8b3a4c8b4567"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Ejemplo de JSON de una categoría</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+    "name": "Categoría 1",
+    "description": "Descripción de la categoría 1",
+    "parentId": "60c72b2f9b1d8b3a4c8b4567"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Ejemplo de JSON de un comentario</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+    "productId": "60c72b2f9b1d8b3a4c8b4567",
+    "userId": "60c72b2f9b1d8b3a4c8b4567",
+    "username": "usuario123",
+    "rating": 4.5,
+    "comment": "Muy buen producto, la batería dura bastante."
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark> Crear la aplicación FastAPI</p>
+</div>
+<div class="paragraph">
+<p>FastAPI es un framework moderno y de alto rendimiento para construir una APIs REST utilizando Python. Está diseñado para ser fácil de usar, rápido y eficiente, aprovechando las características más recientes de Python, como las anotaciones de tipo (<em>type hints</em>). Algunas de sus características principales incluyen:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Alto rendimiento: Basado en Starlette y Pydantic, lo que lo hace extremadamente rápido.</p>
+</li>
+<li>
+<p>Validación automática: Utiliza las anotaciones de tipo para validar automáticamente las entradas y salidas.</p>
+</li>
+<li>
+<p>Documentación automática: Genera automáticamente documentación interactiva para las APIs. Genera documentación <a href="https://swagger.io/">Swagger</a> y <a href="https://redoc.ly/">ReDoc</a>.</p>
+</li>
+<li>
+<p>Asincronía: Soporta programación asíncrona con <code>async</code> y <code>await</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Para instalar FastAPI es necesario Python 3.7 o superior. A continuación se indican los pasos para instalar FastAPI y un servidor ASGI (por ejemplo, Uvicorn) y verificar la instalación. Un servidor ASGI es un servidor web que puede manejar conexiones asíncronas y es necesario para ejecutar aplicaciones FastAPI.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Instalación de FastAPI</strong></p>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Para crear una API REST con FastAPI es necesario instalar el framework y un servidor ASGI. El entorno de desarrollo que estamos usando en este tutorial ya lo tiene configurado, pero si no estuvieran instalados bastaría instalarlos con</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">pip install "fastapi[standard]"
+pip install uvicorn</code></pre>
+</div>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>Para comenzar a desarrollar la API REST con FastAPI, basta con crear un archivo <code>main.py</code> con el siguiente código y ejecutar el servidor Uvicorn, si no se ha hecho ya (En el caso de usar el entorno con Docker del tutorial, el servidor Uvicorn ya se está ejecutando en el contenedor de Python):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+async def read_root():
+    return {"message": "Hello, World!"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Si se opta por ejecutar el servidor Uvicorn en local, se pone en marcha con el siguiente comando:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">uvicorn main:app --reload</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>El servidor Uvicorn se estaría ejecutando en modo de recarga automática. Por tanto, cada vez que se realice un cambio en el código, el servidor se reiniciará automáticamente y se aplicarán los cambios. Si se abre un navegador y se accede a <code><a href="http://localhost:8000" class="bare">http://localhost:8000</a></code>, se debería ver el mensaje "Hello, World!".</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/hello-world.png" alt="Hello" width="World!">
+</div>
+</div>
+<div class="paragraph">
+<p>El servidor Uvicorn se ejecuta en el puerto 8000 por defecto. Si se desea usar otro puerto, se puede especificar con el parámetro <code>--port</code>. El siguiente comando ejecuta el servidor Uvicorn en el puerto 8000 con recarga automática.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">uvicorn main:app --reload --port 8000</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark> Swagger y ReDoc</p>
+</div>
+<div class="paragraph">
+<p><a href="https://swagger.io/">Swagger</a> y <a href="https://redoc.ly/">ReDoc</a> son herramientas de documentación de APIs que permiten visualizar y probar las rutas de la API de forma interactiva. FastAPI genera automáticamente documentación interactiva para las APIs en formato Swagger y ReDoc. La documentación se genera automáticamente a partir de las anotaciones de tipo y los esquemas definidos en el código. Los esquemas de datos se utilizan para validar las entradas y salidas de las rutas de la API y los definiremos utilizando <a href="https://pydantic-docs.helpmanual.io/">Pydantic</a>. Pydantic es una biblioteca de validación de datos y serialización de objetos que se integra perfectamente con FastAPI.</p>
+</div>
+<div class="paragraph">
+<p>La documentación Swagger generada está disponible en la ruta <code>/docs</code> de la aplicación FastAPI. La figura siguiente muestra la página de documentación de Swagger.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/swagger-ui.png" alt="Swagger UI">
+</div>
+</div>
+<div class="paragraph">
+<p>Es posible cambiar el título y la descripción de la documentación de Swagger utilizando los parámetros <code>title</code> y <code>description</code> al crear la aplicación FastAPI. Por ejemplo, se pueden hacer los siguientes cambios en el archivo <code>main.py</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">app = FastAPI(
+    title="Products and Reviews API",
+    description="API for managing products and reviews using FastAPI and MySQL",
+    version="1.0.0"
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Después de este cambio, la documentación de Swagger mostrará el título y la descripción personalizados, como ilustra la figura siguiente.</p>
+</div>
+<div class="paragraph">
+<p>Por otro lado, ReDoc es otra herramienta de documentación que presenta las rutas de la API de manera más estructurada y profesional. Está disponible en la ruta <code>/redoc</code>. La figura siguiente muestra la página de documentación de ReDoc.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/redoc.png" alt="ReDoc">
+</div>
+</div>
+<div class="paragraph">
+<p>Ambas herramientas son generadas automáticamente por FastAPI a partir de las anotaciones de tipo y los esquemas definidos en el código. Esto elimina la necesidad de escribir documentación manualmente y asegura que siempre esté sincronizada con la implementación de la API.</p>
+</div>
+<div class="paragraph">
+<p><mark>#</mark> Organización del código</p>
+</div>
+<div class="paragraph">
+<p>Para mantener el código organizado y facilitar el desarrollo, se recomienda dividir la aplicación en módulos y archivos separados. En FastAPI, se pueden definir las rutas y la lógica de negocio en módulos separados, y luego importarlos en el archivo principal de la aplicación. Esto facilita la gestión de rutas y la escalabilidad de la aplicación. A continuación se muestra una propuesta de organización de código en FastAPI.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">FastAPIMySQLAPIProductosValoraciones/
+│
+├── __init__.py         # Archivo de inicialización. Puede estar vacío. Permite que Python trate el directorio como un paquete.
+├── .env                # Archivo de variables de entorno
+├── main.py             # Archivo principal de la aplicación
+├── requirements.txt    # Archivo de dependencias
+├── database.py         # Configuración de la base de datos
+├── models.py           # Definición de modelos Pydantic
+├── start.sh            # Script de inicio
+├── create_data.sh      # Script opcional para crear datos de prueba
+├── routes/             # Directorio de rutas
+│   ├── users.py        # Rutas para usuarios
+│   ├── products.py     # Rutas para productos
+│   ├── categories.py   # Rutas para categorías
+│   ├── reviews.py      # Rutas para valoraciones
+│   ├── test.py         # Rutas de prueba</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark> Primeros archivos</p>
+</div>
+<div class="paragraph">
+<p>A continuación se muestra el contenidos de los primeros archivos con los que arrancaremos la API. Eliminaremos la ruta (<code>/</code>) que hemos creado anteriormente a modo de prueba y añadiremos una nueva ruta de prueba (<code>/test</code>), pero ya en un archivo separado y en la carpeta <code>routes</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Archivo <code>.env</code></strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">MYSQL_USER=example
+MYSQL_PASSWORD=example
+MYSQL_HOST=mysql
+MYSQL_DATABASE=mydatabase</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>En este caso el valor de <code>mysql</code> se refiere al nombre del servicio MySQL definido en el archivo <code>docker-compose.yml</code>. Este es el mismo nombre que se utiliza en el archivo <code>docker-compose.yml</code>. Si se cuenta con un servidor MySQL en una URL específica, se puede cambiar el valor de <code>MYSQL_HOST</code> por la URL del servidor.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p><strong>Archivo <code>database.py</code></strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+username = os.environ.get('MYSQL_USER')
+password = os.environ.get('MYSQL_PASSWORD')
+host = os.environ.get('MYSQL_HOST')
+database = os.environ.get('MYSQL_DATABASE', 'mydatabase')
+
+uri = f"mysql+mysqlconnector://{username}:{password}@{host}:3306/{database}"
+
+engine = create_engine(uri)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# Función para obtener sesión de DB
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>La conexión a MySQL se hace a través del método <code>create_engine</code> de la biblioteca <code>sqlalchemy</code>. Se utilizan las variables de entorno definidas en el archivo <code>.env</code> para la configuración de la conexión. Una vez establecida la conexión, se crea una sesión para interactuar con la base de datos y se define la base declarativa para los modelos.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p><strong>Archivo <code>models.py</code></strong></p>
+</div>
+<div class="paragraph">
+<p>Definimos aquí las clases Pydantic que representan los modelos de datos de la aplicación. Estos modelos se utilizan para validar los datos de entrada y salida de las rutas de la API. Por ejemplo, el modelo <code>Product</code> se utiliza para validar los datos de un producto y el modelo <code>ProductResponse</code> se utiliza para devolver los datos de un producto con su ID. Para definir las clases usaremos la especificación de los JSON que se ha hecho en la sección <a href="#Especificación de los endpoints de la API">[Especificación de los endpoints de la API]</a>.</p>
+</div>
+<div class="paragraph">
+<p>Definiremos también clases de respuesta para los modelos de datos, que incluyen el ID generado por la base de datos y otros campos adicionales como las fechas de creación y actualización.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from pydantic import BaseModel
+from typing import Optional, List
+
+class UserRequest(BaseModel):
+    username: str
+    email: str
+
+class UserResponse(UserRequest):
+    id: int
+    created_at: str
+
+class Product(BaseModel):
+    name: str
+    description: str
+    price: float
+    categoryId: str
+
+class ProductResponse(Product):
+    id: str
+
+class Category(BaseModel):
+    name: str
+    description: str
+    parentId: Optional[str] = None
+
+class CategoryResponse(Category):
+    id: str
+
+class Review(BaseModel):
+    productId: str
+    userId: str
+    username: str
+    rating: float
+    comment: str
+
+class ReviewResponse(Review):
+    id: str
+    createdAt: str
+    updatedAt: Optional[str] = None
+````
+
+**Archivo `routes/test.py`**
+
+```python
+from fastapi import APIRouter
+
+router = APIRouter()
+
+# Define a test API endpoint
+@router.get("/")
+async def test_api():
+    return {"message": "API is working"}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>En este archivo definimos un endpoint de prueba <code>GET /api/test</code> que devuelve un mensaje de prueba. Este endpoint se utilizará para comprobar que la API está funcionando correctamente. El código del endpoint se define en una función asíncrona que devuelve un diccionario con el mensaje "API is working".</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p><strong>Archivo <code>main.py</code></strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from fastapi import FastAPI
+from routes import test
+
+app = FastAPI()
+
+app.include_router(test.router, prefix="/api/test", tags=["test"])</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>En este archivo creamos la aplicación FastAPI y añadimos el router de prueba que definimos anteriormente. El router se incluye en la aplicación con el prefijo <code>/api/test</code> y se le asigna la etiqueta <code>test</code>. Esto significa que el endpoint de prueba estará disponible en la ruta <code>/api/test</code> y se mostrará en la documentación de la API con la etiqueta <code>test</code>.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>Tras esto, la API REST debería estar funcionando correctamente. Se puede probar accediendo a la URL <code><a href="http://localhost:8000/api/test" class="bare">http://localhost:8000/api/test</a></code> en un navegador o utilizando una herramienta como Postman. También se puede probar la documentación de la API en <code><a href="http://localhost:8000/docs" class="bare">http://localhost:8000/docs</a></code> o <code><a href="http://localhost:8000/redoc" class="bare">http://localhost:8000/redoc</a></code>. La respuesta debería ser un mensaje JSON con el texto "API is working". La figura siguiente ilustra la llamada al endpoint de prueba desde Swagger.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/test-api.png" alt="Endpoint de prueba">
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark> Endpoints de usuarios</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Aunque el resto de endpoints se van a desarrollar con SQLAlchemy para interactuar con MySQL, el endpoint de usuarios se va a implementar utilizando consultas SQL directas para mostrar un ejemplo de cómo interactuar con MySQL sin usar un ORM. Esto puede ser útil en situaciones en las que nos queremos introducir en el desarrollo de la API REST paulatinamente aprovechando conocimientos previos de SQL, cuando se requiere un mayor control sobre las consultas SQL o cuando se quiere evitar la sobrecarga de un ORM en aplicaciones simples.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>En el archivo <code>routes/users.py</code> añade el siguiente código antes de la definición de las rutas de usuarios:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+from typing import List
+from models import UserRequest, UserResponse
+from database import get_db
+
+router = APIRouter()
+
+// Los endpoints de usuarios se definen aquí</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Añadir el enrutado de usuarios a <code>main.py</code></p>
+</div>
+<div class="paragraph">
+<p>Modificar el archivo <code>main.py</code> para incluir el enrutado de usuarios en la aplicación FastAPI. Se harán modificaciones para importar el router de usuarios y añadirlo a la aplicación con el prefijo <code>/api/users</code> y la etiqueta <code>users</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from fastapi import FastAPI
+from routes import test, users # Importar el router de usuarios
+from database import engine
+from sqlalchemy import text
+
+# Crear tabla users si no existe
+with engine.connect() as conn:
+    conn.execute(text("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL UNIQUE,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """))
+    conn.commit()
+
+app.include_router(test.router, prefix="/api/test", tags=["test"])
+app.include_router(users.router, prefix="/api/users", tags=["users"])   # Añadir el router de usuarios</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para crear un usuario</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>POST /api/users</code> que permite crear un nuevo usuario. Este endpoint recibe los datos del usuario en formato JSON en el cuerpo de la solicitud y los inserta en la tabla de usuarios de MySQL. En el cuerpo de la solicitud se deben proporcionar los siguientes campos: <code>username</code> y <code>email</code>. El endpoint devuelve los datos del usuario creado, incluyendo su ID generado por la base de datos. La operación SQL que se usaría para insertar un registro en la tabla de usuarios sería similar a la siguiente:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">INSERT INTO users (username, email) VALUES ('usuario123', 'usuario123@example.com');</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to create a new user
+@router.post("/", response_model=UserResponse, status_code=201)
+async def create_user(user: UserRequest, db: Session = Depends(get_db)):
+    try:
+        result = db.execute(text("INSERT INTO users (username, email) VALUES (:username, :email)"), {"username": user.username, "email": user.email})
+        db.commit()
+        user_id = result.lastrowid
+        result_select = db.execute(text("SELECT id, username, email, created_at FROM users WHERE id = :id"), {"id": user_id})
+        row = result_select.fetchone()
+        return UserResponse(id=row[0], username=row[1], email=row[2], created_at=row[3].strftime("%Y-%m-%dT%H:%M:%SZ"))
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para obtener todos los usuarios</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>GET /api/users</code> que permite obtener todos los usuarios. Este endpoint consulta todos los registros de la tabla de usuarios de MySQL y los devuelve en formato JSON. La operación SQL que se usaría para consultar todos los registros en la tabla de usuarios sería similar a la siguiente:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">SELECT id, username, email, created_at FROM users;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to get all users
+@router.get("/", response_model=List[UserResponse])
+async def get_users(db: Session = Depends(get_db)):
+    result = db.execute(text("SELECT id, username, email, created_at FROM users"))
+    users = []
+    for row in result:
+        users.append(UserResponse(id=row[0], username=row[1], email=row[2], created_at=row[3].strftime("%Y-%m-%dT%H:%M:%SZ")))
+    return users</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para obtener un usuario por ID</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>GET /api/users/{id}</code> que permite obtener un usuario por su ID. Este endpoint consulta el registro de la tabla de usuarios de MySQL correspondiente al ID proporcionado en la URL y lo devuelve en formato JSON. Si el usuario existe, se devuelve su información en formato JSON. Si el usuario no existe, se devuelve un mensaje de error. La operación SQL que se usaría para consultar un registro en la tabla de usuarios por su ID sería similar a la siguiente:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">SELECT id, username, email, created_at FROM users WHERE id = 1;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to get a user by ID
+@router.get("/{id}", response_model=UserResponse)
+async def get_user(id: int, db: Session = Depends(get_db)):
+    result = db.execute(text("SELECT id, username, email, created_at FROM users WHERE id = :id"), {"id": id})
+    row = result.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="User not found")
+    return UserResponse(id=row[0], username=row[1], email=row[2], created_at=row[3].strftime("%Y-%m-%dT%H:%M:%SZ"))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para actualizar un usuario</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>PUT /api/users/{id}</code> que permite actualizar un usuario por su ID. Este endpoint recibe el ID del usuario como parámetro en la URL y los nuevos datos del usuario en formato JSON en el cuerpo de la solicitud. Los datos del usuario a actualizar deben incluir los campos: <code>username</code> y <code>email</code>. El endpoint busca el usuario por su ID. El endpoint actualiza el usuario correspondiente en la tabla de usuarios de MySQL. Si el usuario se actualiza correctamente, se devuelve un mensaje de éxito. Si el usuario no existe, se devuelve un mensaje de error. La operación SQL que se usaría para actualizar un usuario en la tabla de usuarios sería similar a la siguiente:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">UPDATE users SET username = 'nuevo_usuario', email = 'nuevo_email@example.com' WHERE id = 1;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to update a user by ID
+@router.put("/{id}", response_model=UserResponse)
+async def update_user(id: int, user: UserRequest, db: Session = Depends(get_db)):
+    try:
+        db.execute(text("UPDATE users SET username = :username, email = :email WHERE id = :id"), {"username": user.username, "email": user.email, "id": id})
+        db.commit()
+        result = db.execute(text("SELECT id, username, email, created_at FROM users WHERE id = :id"), {"id": id})
+        row = result.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="User not found")
+        return UserResponse(id=row[0], username=row[1], email=row[2], created_at=row[3].strftime("%Y-%m-%dT%H:%M:%SZ"))
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para eliminar un usuario</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>DELETE /api/users/{id}</code> que permite eliminar un usuario por su ID. Este endpoint recibe el ID del usuario como parámetro en la URL. El endpoint busca el usuario por su ID y lo elimina de la tabla de usuarios de MySQL. Si el usuario se elimina correctamente, se devuelve un mensaje de éxito. Si el usuario no existe, se devuelve un mensaje de error. La operación SQL que se usaría para eliminar un usuario en la tabla de usuarios sería similar a la siguiente:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">DELETE FROM users WHERE id = 1;</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to delete a user by ID
+@router.delete("/{id}")
+async def delete_user(id: int, db: Session = Depends(get_db)):
+    try:
+        result = db.execute(text("DELETE FROM users WHERE id = :id"), {"id": id})
+        if result.rowcount == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        db.commit()
+        return {"message": "User deleted"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark> Endpoints de categorías</p>
+</div>
+<div class="paragraph">
+<p>En esta sección vamos a implementar los endpoints para gestionar categorías en la API REST. Los endpoints incluyen la creación, consulta, actualización y eliminación de categorías.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>De aquí en adelante, los endpoints se implementarán utilizando SQLAlchemy para interactuar con MySQL. SQLAlchemy es un ORM (Object-Relational Mapping) que facilita la interacción con bases de datos relacionales mediante el uso de objetos y clases en lugar de escribir consultas SQL directamente. Esto permite una mayor abstracción y facilita el desarrollo de la API REST. Con SQLAlchemy, se pueden definir modelos de datos como clases de Python y utilizar métodos y funciones (como <code>add</code>, <code>query</code>, <code>filter</code>, <code>update</code>, <code>delete</code>, etc.) para realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) en la base de datos.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>En el archivo <code>routes/categories.py</code> añade el siguiente código antes de la definición de las rutas de categorías:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
+from typing import List
+from models import Category, CategoryResponse, CategoryDB
+from database import get_db
+
+router = APIRouter()
+
+// Los endpoints de categorías se definen aquí</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Añadir el enrutado de categorías a <code>main.py</code></p>
+</div>
+<div class="paragraph">
+<p>Modificar el archivo <code>main.py</code> para incluir el enrutado de categorías en la aplicación FastAPI. Se harán modificaciones para importar el router de categorías y añadirlo a la aplicación con el prefijo <code>/api/categories</code> y la etiqueta <code>categories</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from fastapi import FastAPI
+from routes import test, users, categories # Importar el router de categorías
+from database import engine, Base
+from sqlalchemy import text
+
+# Crear tablas si no existen. Al usar SQLAlchemy, se crean todas las tablas definidas en los modelos que heredan de Base
+Base.metadata.create_all(bind=engine)
+
+# Crear tabla users si no existe
+with engine.connect() as conn:
+    conn.execute(text("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL UNIQUE,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """))
+    conn.commit()
+
+app = FastAPI(
+    title="Products and Reviews API",
+    description="API for managing products and reviews using FastAPI and MySQL",
+    version="1.0.0"
+)
+
+app.include_router(test.router, prefix="/api/test", tags=["test"])
+app.include_router(users.router, prefix="/api/users", tags=["users"])
+app.include_router(categories.router, prefix="/api/categories", tags=["categories"])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para crear una categoría</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>POST /api/categories</code> que permite crear una nueva categoría. Este endpoint recibe los datos de la categoría en formato JSON en el cuerpo de la solicitud y los inserta en la tabla de categorías de MySQL. En el cuerpo de la solicitud se deben proporcionar los siguientes campos: <code>name</code>, <code>description</code> y <code>parentId</code>. El endpoint devuelve un mensaje con el ID de la nueva categoría creada.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se crea una instancia del modelo <code>CategoryDB</code> con los datos proporcionados y se añade a la sesión de la base de datos. Luego, se confirma la transacción para guardar los cambios en la base de datos.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to create a new category
+@router.post("/", response_model=CategoryResponse, status_code=201)
+async def create_category(category: Category, db: Session = Depends(get_db)):
+    category_db = CategoryDB(**category.dict())
+    db.add(category_db)
+    db.commit()
+    db.refresh(category_db)
+    return CategoryResponse(id=category_db.id, **category.dict())</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para obtener todas las categorías</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>GET /api/categories</code> que permite obtener todas las categorías. Este endpoint consulta todas las categorías de la tabla de categorías de MySQL y las devuelve en formato JSON.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de categorías usando el ORM y se devuelve la lista de categorías.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to get all categories
+@router.get("/", response_model=List[CategoryResponse])
+async def get_categories(db: Session = Depends(get_db)):
+    categories = db.query(CategoryDB).all()
+    return [CategoryResponse(id=c.id, name=c.name, description=c.description, parentId=c.parentId) for c in categories]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para obtener una categoría por ID</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>GET /api/categories/{id}</code> que permite obtener una categoría por su ID. Este endpoint recibe el ID de la categoría como parámetro en la URL y busca la categoría correspondiente en la tabla de categorías de MySQL. Si la categoría existe, se devuelve su información en formato JSON. Si la categoría no existe, se devuelve un mensaje de error.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de categorías usando el ORM y se devuelve la categoría.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to get a category by ID
+@router.put("/{id}", response_model=CategoryResponse)
+async def update_category(id: int, category: Category, db: Session = Depends(get_db)):
+    category_db = db.query(CategoryDB).filter(CategoryDB.id == id).first()
+    if not category_db:
+        raise HTTPException(status_code=404, detail="Category not found")
+    for key, value in category.dict().items():
+        setattr(category_db, key, value)
+    db.commit()
+    db.refresh(category_db)
+    return CategoryResponse(id=category_db.id, **category.dict())</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para actualizar una categoría</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>PUT /api/categories/{id}</code> que permite actualizar una categoría por su ID. Este endpoint recibe el ID de la categoría como parámetro en la URL y los nuevos datos de la categoría en formato JSON en el cuerpo de la solicitud. Los datos de la categoría a actualizar deben incluir los campos <code>name</code>, <code>description</code> y <code>parentId</code>. El endpoint actualiza la categoría correspondiente en la tabla de categorías de MySQL. Si la categoría se actualiza correctamente, se devuelve un mensaje de éxito. Si la categoría no se encuentra, se devuelve un mensaje de error.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de categorías usando el ORM, se actualizan los campos y se confirma la transacción para guardar los cambios en la base de datos.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to update a category by ID
+@router.put("/{id}", response_model=CategoryResponse)
+async def update_category(id: str, category: Category):
+    try:
+        result = categories_collection.update_one(
+            {"_id": ObjectId(id)},
+            {"$set": category.dict()}
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Category not found")
+        updated_category = categories_collection.find_one({"_id": ObjectId(id)})
+        updated_category["id"] = str(updated_category["_id"])
+        del updated_category["_id"]
+        return updated_category
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid category ID")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para eliminar una categoría</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>DELETE /api/categories/{id}</code> que permite eliminar una categoría por su ID. Este endpoint recibe el ID de la categoría como parámetro en la URL y elimina la categoría correspondiente de la tabla de categorías de MySQL. Si la categoría se elimina correctamente, se devuelve un mensaje de éxito. Si la categoría no se encuentra, se devuelve un mensaje de error.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de categorías usando el ORM y se elimina la categoría.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to delete a category by ID
+@router.delete("/{id}", status_code=200)
+async def delete_category(id: int, db: Session = Depends(get_db)):
+    category = db.query(CategoryDB).filter(CategoryDB.id == id).first()
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    db.delete(category)
+    db.commit()
+    return {"message": "Category deleted"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark> Endpoints de productos</p>
+</div>
+<div class="paragraph">
+<p>En esta sección vamos a implementar los endpoints para gestionar productos en la API REST. Los endpoints incluyen la creación, consulta, actualización y eliminación de productos.</p>
+</div>
+<div class="paragraph">
+<p>En el archivo <code>routes/products.py</code> añade el siguiente código antes de la definición de las rutas de productos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
+from typing import Optional, List
+from models import Product, ProductResponse, ProductDB
+from database import get_db
+
+router = APIRouter()
+
+// Los endpoints de productos se definen aquí</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Añadir el enrutado de productos a <code>main.py</code></p>
+</div>
+<div class="paragraph">
+<p>Modificar el archivo <code>main.py</code> para incluir el enrutado de productos en la aplicación FastAPI. Se harán modificaciones para importar el router de productos y añadirlo a la aplicación con el prefijo <code>/api/products</code> y la etiqueta <code>products</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from fastapi import FastAPI
+from routes import test, users, categories, products # Importar el router de productos
+from database import engine, Base
+from sqlalchemy import text
+
+# Crear tablas si no existen. Al usar SQLAlchemy, se crean todas las tablas definidas en los modelos que heredan de Base
+Base.metadata.create_all(bind=engine)
+
+# Crear tabla users si no existe
+with engine.connect() as conn:
+    conn.execute(text("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL UNIQUE,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """))
+    conn.commit()
+
+app = FastAPI(
+    title="Products and Reviews API",
+    description="API for managing products and reviews using FastAPI and MySQL",
+    version="1.0.0"
+)
+
+app.include_router(test.router, prefix="/api/test", tags=["test"])
+app.include_router(users.router, prefix="/api/users", tags=["users"])
+app.include_router(categories.router, prefix="/api/categories", tags=["categories"])
+app.include_router(products.router, prefix="/api/products", tags=["products"])  # Añadir el router de productos</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para crear un producto</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>POST /api/products</code> que permite crear un nuevo producto. Este endpoint recibe los datos del producto en formato JSON en el cuerpo de la solicitud y los inserta en la tabla de productos de MySQL. En el cuerpo de la solicitudo se deben proporcionar los siguientes campos: <code>name</code>, <code>description</code>, <code>price</code> y <code>categoryId</code>. El endpoint devuelve un mensaje con el ID del nuevo producto creado.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se crea una instancia del modelo <code>ProductDB</code> con los datos proporcionados y se añade a la sesión de la base de datos. Luego, se confirma la transacción para guardar los cambios en la base de datos.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to create a new product
+@router.post("/", response_model=ProductResponse, status_code=201)
+async def create_product(product: Product, db: Session = Depends(get_db)):
+    product_db = ProductDB(**product.dict())
+    db.add(product_db)
+    db.commit()
+    db.refresh(product_db)
+    return ProductResponse(**product.dict(), id=product_db.id)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para obtener detalles de un producto</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>GET /api/products/{id}</code> que permite obtener los detalles de un producto por su ID. Este endpoint recibe el ID del producto como parámetro en la URL y busca el producto correspondiente en la tabla de productos de MySQL. Si el producto existe, se devuelve su información en formato JSON. Si el producto no existe, se devuelve un mensaje de error.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de productos usando el ORM y se devuelve el producto.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to get a product by ID
+@router.get("/{id}", response_model=ProductResponse)
+async def get_product(id: int, db: Session = Depends(get_db)):
+    product = db.query(ProductDB).filter(ProductDB.id == id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return ProductResponse(id=product.id, name=product.name, description=product.description, price=product.price, categoryId=product.categoryId)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para consultar productos</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>GET /api/products</code> que permite consultar productos. Este endpoint admite parámetros de consulta opcionales para filtrar los productos por categoría (<code>categoryId</code>) o por nombre (<code>name</code>). Si se proporciona el parámetro <code>categoryId</code>, se filtran los productos por la categoría especificada. Si se proporciona el parámetro <code>name</code>, se filtran los productos por el nombre que coincida con la cadena especificada. Se pueden combinar ambos parámetros para realizar búsquedas más específicas. Esta operación devuelve una lista de productos en formato JSON.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de productos usando el ORM y se devuelve la lista de productos.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to get all products
+@router.get("/", response_model=List[ProductResponse])
+async def get_products(categoryId: Optional[str] = None, name: Optional[str] = None, db: Session = Depends(get_db)):
+    query = db.query(ProductDB)
+    if categoryId:
+        query = query.filter(ProductDB.categoryId == categoryId)
+    if name:
+        query = query.filter(ProductDB.name.ilike(f"%{name}%"))
+    products = query.all()
+    return [ProductResponse(id=p.id, name=p.name, description=p.description, price=p.price, categoryId=p.categoryId) for p in products]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para actualizar un producto</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>PUT /api/products/{id}</code> que permite actualizar un producto por su ID. Este endpoint recibe el ID del producto como parámetro en la URL y los nuevos datos del producto en formato JSON en el cuerpo de la solicitud. Los datos del producto a actualizar deben incluir los campos <code>name</code>, <code>description</code>, <code>price</code> y <code>categoryId</code>. El endpoint actualiza el producto correspondiente en la tabla de productos de MySQL. Si el producto se actualiza correctamente, se devuelve un mensaje de éxito. Si el producto no se encuentra, se devuelve un mensaje de error.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de productos usando el ORM, se actualizan los campos y se confirma la transacción para guardar los cambios en la base de datos.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to update a product by ID
+@router.put("/{id}", response_model=ProductResponse)
+async def update_product(id: int, product: Product, db: Session = Depends(get_db)):
+    product_db = db.query(ProductDB).filter(ProductDB.id == id).first()
+    if not product_db:
+        raise HTTPException(status_code=404, detail="Product not found")
+    for key, value in product.dict().items():
+        setattr(product_db, key, value)
+    db.commit()
+    db.refresh(product_db)
+    return ProductResponse(id=product_db.id, **product.dict())</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para eliminar un producto</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>DELETE /api/products/{id}</code> que permite eliminar un producto por su ID. Este endpoint recibe el ID del producto como parámetro en la URL y elimina el producto correspondiente de la tabla de productos de MySQL. También elimina los comentarios asociados al producto. Si el producto se elimina correctamente, se devuelve un mensaje de éxito. Si el producto no se encuentra, se devuelve un mensaje de error.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de productos usando el ORM y se elimina el producto. Luego, se eliminan los comentarios asociados al producto.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to delete a product by ID
+@router.delete("/{id}", status_code=200)
+async def delete_product(id: int, db: Session = Depends(get_db)):
+    product = db.query(ProductDB).filter(ProductDB.id == id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    db.delete(product)
+    # Delete associated reviews (including their comments)
+    from models import ReviewDB
+    db.query(ReviewDB).filter(ReviewDB.productId == id).delete()
+    db.commit()
+    return {"message": "Product and associated reviews deleted"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark> Endpoints de comentarios</p>
+</div>
+<div class="paragraph">
+<p>En esta sección, vamos a implementar los endpoints para gestionar comentarios en la API REST. Los endpoints incluyen la creación, consulta, actualización y eliminación de comentarios.</p>
+</div>
+<div class="paragraph">
+<p>En el archivo <code>routes/reviews.py</code> añade el siguiente código antes de la definición de las rutas de comentarios:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
+from typing import List, Optional
+from datetime import datetime
+from models import Review, ReviewResponse, ReviewDB
+from database import get_db
+import pytz
+
+router = APIRouter()
+
+// Los endpoints de comentarios se definen aquí</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Añadir el enrutado de comentarios a <code>main.py</code></p>
+</div>
+<div class="paragraph">
+<p>Modificar el archivo <code>main.py</code> para incluir el enrutado de comentarios en la aplicación FastAPI. Se harán modificaciones para importar el router de comentarios y añadirlo a la aplicación con el prefijo <code>/api/reviews</code> y la etiqueta <code>reviews</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">from fastapi import FastAPI
+from routes import test, users, categories, products, reviews   # Importar el router de comentarios
+from database import engine, Base
+from sqlalchemy import text
+
+# Crear tablas si no existen. Al usar SQLAlchemy, se crean todas las tablas definidas en los modelos que heredan de Base
+Base.metadata.create_all(bind=engine)
+
+# Crear tabla users si no existe
+with engine.connect() as conn:
+    conn.execute(text("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL UNIQUE,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """))
+    conn.commit()
+
+app = FastAPI(
+    title="Products and Reviews API",
+    description="API for managing products and reviews using FastAPI and MySQL",
+    version="1.0.0"
+)
+
+app.include_router(test.router, prefix="/api/test", tags=["test"])
+app.include_router(users.router, prefix="/api/users", tags=["users"])
+app.include_router(categories.router, prefix="/api/categories", tags=["categories"])
+app.include_router(products.router, prefix="/api/products", tags=["products"])
+app.include_router(reviews.router, prefix="/api/reviews", tags=["reviews"])  # Añadir el router de comentarios</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para añadir un comentario a un producto</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>POST /api/reviews</code> que permite añadir un comentario a un producto. Este endpoint recibe los datos del comentario en formato JSON en el cuerpo de la solicitud y los inserta en la tabla de comentarios de MySQL. En el cuerpo de la solicitud se deben proporcionar los siguientes campos: <code>productId</code>, <code>userId</code>, <code>username</code>, <code>rating</code> y <code>comment</code>. El endpoint devuelve un mensaje con el ID del nuevo comentario creado.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se crea una instancia del modelo <code>ReviewDB</code> con los datos proporcionados y se añade a la sesión de la base de datos. Luego, se confirma la transacción para guardar los cambios en la base de datos.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to create a new review
+@router.post("/", response_model=ReviewResponse, status_code=201)
+async def create_review(review: Review, db: Session = Depends(get_db)):
+    review_db = ReviewDB(**review.dict(), createdAt=datetime.now(pytz.UTC))
+    db.add(review_db)
+    db.commit()
+    db.refresh(review_db)
+    return ReviewResponse(id=review_db.id, createdAt=review_db.createdAt.strftime("%Y-%m-%dT%H:%M:%SZ"), **review.dict())</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para obtener los comentarios de un producto o por usuario</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>GET /api/reviews</code> que permite obtener los comentarios de un producto o por usuario. Este endpoint admite parámetros de consulta opcionales para filtrar los comentarios por producto (<code>productId</code>) o por usuario (<code>userId</code>). Si se proporciona el parámetro <code>productId</code>, se filtran los comentarios por el producto especificado. Si se proporciona el parámetro <code>userId</code>, se filtran los comentarios por el usuario especificado. Se pueden combinar ambos parámetros para realizar búsquedas más específicas. Esta operación devuelve una lista de comentarios en formato JSON.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de comentarios usando el ORM y se devuelve la lista de comentarios.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to get all reviews or filter by productId or userId
+@router.get("/", response_model=List[ReviewResponse])
+async def get_reviews(productId: Optional[int] = None, userId: Optional[str] = None, db: Session = Depends(get_db)):
+    query = db.query(ReviewDB)
+    if productId:
+        query = query.filter(ReviewDB.productId == productId)
+    if userId:
+        query = query.filter(ReviewDB.userId == userId)
+    reviews = query.all()
+    return [ReviewResponse(id=r.id, productId=r.productId, userId=r.userId, username=r.username, rating=r.rating, comment=r.comment, createdAt=r.createdAt.strftime("%Y-%m-%dT%H:%M:%SZ"), updatedAt=r.updatedAt.strftime("%Y-%m-%dT%H:%M:%SZ") if r.updatedAt else None) for r in reviews]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para actualizar un comentario</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>PUT /api/reviews/{id}</code> que permite actualizar un comentario por su ID. Este endpoint recibe el ID del comentario como parámetro en la URL y los nuevos datos del comentario en formato JSON en el cuerpo de la solicitud. Los datos del comentario a actualizar deben incluir los campos <code>userId</code>, <code>rating</code> y <code>comment</code>. El endpoint actualiza el comentario correspondiente en la tabla de comentarios de MySQL. Como medida de seguridad se verifica que el usuario que intenta actualizar el comentario sea el mismo que lo creó. Si el comentario se actualiza correctamente, se devuelve un mensaje de éxito. Si el comentario no se encuentra, se devuelve un mensaje de error.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de comentarios usando el ORM, se actualizan los campos y se confirma la transacción para guardar los cambios en la base de datos.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to update a review by ID
+@router.put("/{id}", response_model=ReviewResponse)
+async def update_review(id: int, review: Review, db: Session = Depends(get_db)):
+    review_db = db.query(ReviewDB).filter(ReviewDB.id == id, ReviewDB.userId == review.userId).first()
+    if not review_db:
+        raise HTTPException(status_code=403, detail="You can only update your own reviews")
+    review_db.rating = review.rating
+    review_db.comment = review.comment
+    review_db.updatedAt = datetime.now(pytz.UTC)
+    db.commit()
+    db.refresh(review_db)
+    return ReviewResponse(id=review_db.id, productId=review_db.productId, userId=review_db.userId, username=review_db.username, rating=review_db.rating, comment=review_db.comment, createdAt=review_db.createdAt.strftime("%Y-%m-%dT%H:%M:%SZ"), updatedAt=review_db.updatedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><mark>#</mark># Endpoint para eliminar un comentario</p>
+</div>
+<div class="paragraph">
+<p>Añade el siguiente código para definir un endpoint <code>DELETE /api/reviews/{id}</code> que permite eliminar un comentario por su ID. Este endpoint recibe el ID del comentario como parámetro en la URL y elimina el comentario correspondiente de la tabla de comentarios de MySQL. Como medida de seguridad se verifica que el usuario que intenta eliminar el comentario sea el mismo que lo creó. Si el comentario se elimina correctamente, se devuelve un mensaje de éxito. Si el comentario no se encuentra, se devuelve un mensaje de error.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># Route to delete a review by ID
+@router.delete("/{id}")
+async def delete_review(id: int, request_body: dict, db: Session = Depends(get_db)):
+    userId = request_body.get("userId")
+    if not userId:
+        raise HTTPException(status_code=400, detail="userId is required in request body")
+    review = db.query(ReviewDB).filter(ReviewDB.id == id, ReviewDB.userId == userId).first()
+    if not review:
+        raise HTTPException(status_code=403, detail="You can only delete your own reviews")
+    db.delete(review)
+    db.commit()
+    return {"message": "Review deleted"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>## Indices para mejorar el rendimiento</p>
+</div>
+<div class="paragraph">
+<p>Los índices son cruciales para mejorar el rendimiento de las consultas en una base de datos. Sin índices, MySQL debe realizar un escaneo completo de las tablas para encontrar los registros que coinciden con la consulta, lo que puede ser muy ineficiente y lento, especialmente en tablas grandes. Los índices permiten a MySQL buscar de manera más eficiente, reduciendo el tiempo de respuesta de las consultas y mejorando el rendimiento general de la aplicación.</p>
+</div>
+<div class="paragraph">
+<p>En el contexto de esta API, los índices pueden ayudar a acelerar las consultas que filtran productos por categoría, buscan productos por nombre, o filtran comentarios por producto o usuario. Al definir índices en los campos más consultados, se puede reducir significativamente el tiempo de respuesta de estos endpoints, proporcionando una mejor experiencia de usuario.</p>
+</div>
+<div class="paragraph">
+<p><mark>#</mark> Índices recomendados para la API</p>
+</div>
+<div class="paragraph">
+<p>Definir los índices adecuados en MySQL es una práctica esencial para optimizar el rendimiento de las consultas y garantizar que la API funcione de manera eficiente, incluso con grandes volúmenes de datos. Para mejorar el rendimiento de los endpoints, es recomendable definir los siguientes índices en MySQL:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Indices para la tabla de productos</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Indice en el campo <code>categoryId</code> para filtrar productos por categoría:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">CREATE INDEX idx_categoryId ON products (categoryId);</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Indice en el campo <code>name</code> para buscar productos por nombre:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">CREATE INDEX idx_name ON products (name);</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Indices para la tabla de categorías</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Indice en el campo <code>parentId</code> para construir la jerarquía de categorías:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">CREATE INDEX idx_parentId ON categories (parentId);</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Indices para la tabla de comentarios</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Indice en el campo <code>productId</code> para filtrar comentarios por producto:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">CREATE INDEX idx_productId ON reviews (productId);</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Indice en el campo <code>userId</code> para filtrar comentarios por usuario:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">CREATE INDEX idx_userId ON reviews (userId);x</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>## Pruebas de la API</p>
+</div>
+<div class="paragraph">
+<p>Una vez que hemos desarrollado la API REST con FastAPI, podemos probar los endpoints utilizando Postman. A continuación se muestran algunos ejemplos de peticiones a la API REST:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Crear una nueva categoría:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Método: <code>POST</code></p>
+</li>
+<li>
+<p>URL: <code><a href="http://localhost:8000/api/categories" class="bare">http://localhost:8000/api/categories</a></code></p>
+</li>
+<li>
+<p>Cuerpo: <code>{"name": "Electrónica", "description": "Categoría de productos electrónicos", "parentId": null}</code></p>
+</li>
+<li>
+<p>Respuesta esperada: <code>{
+"name": "Electrónica",
+"description": "Categoría de productos electrónicos",
+"parentId": null,
+"id": "67e1a445567da5eeb6d61a2d"
+}</code></p>
+<div class="imageblock">
+<div class="content">
+<img src="images/postman-create-category.png" alt="postman create category">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Obtener todas las categorías:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Método: <code>GET</code></p>
+</li>
+<li>
+<p>URL: <code><a href="http://localhost:8000/api/categories" class="bare">http://localhost:8000/api/categories</a></code></p>
+</li>
+<li>
+<p>Respuesta esperada: Lista de categorías en formato JSON</p>
+<div class="imageblock">
+<div class="content">
+<img src="images/postman-get-categories.png" alt="postman get categories">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Crear un nuevo producto:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Método: <code>POST</code></p>
+</li>
+<li>
+<p>URL: <code><a href="http://localhost:8000/api/products" class="bare">http://localhost:8000/api/products</a></code></p>
+</li>
+<li>
+<p>Cuerpo: <code>{"name": "Smartphone", "description": "Teléfono inteligente", "price": 500, "categoryId": "67e1a445567da5eeb6d61a2d"}</code></p>
+</li>
+<li>
+<p>Respuesta esperada: <code>{
+    "name": "Smartphone",
+    "description": "Teléfono inteligente",
+    "price": 500.0,
+    "categoryId": "67e1a445567da5eeb6d61a2d",
+    "id": "67e1a595567da5eeb6d61a2f"
+}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Obtener todos los productos de una categoría:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Método: <code>GET</code></p>
+</li>
+<li>
+<p>URL: <code><a href="http://localhost:8000/api/products?categoryId=67e1a445567da5eeb6d61a2d" class="bare">http://localhost:8000/api/products?categoryId=67e1a445567da5eeb6d61a2d</a></code></p>
+</li>
+<li>
+<p>Respuesta esperada: Lista de productos en formato JSON</p>
+<div class="imageblock">
+<div class="content">
+<img src="images/postman-get-products.png" alt="postman get products">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Añadir un comentario a un producto:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Método: <code>POST</code></p>
+</li>
+<li>
+<p>URL: <code><a href="http://localhost:8000/api/reviews" class="bare">http://localhost:8000/api/reviews</a></code></p>
+</li>
+<li>
+<p>Cuerpo: <code>{"productId": "67e1a595567da5eeb6d61a2f", "userId": "60c72b2f9b1d8b3a4c8b4569", "username": "usuario123", "rating": 4.5, "comment": "Muy buen producto, la batería dura bastante."}</code></p>
+</li>
+<li>
+<p>Respuesta esperada: <code>{
+    "productId": "67e1a595567da5eeb6d61a2f",
+    "userId": "60c72b2f9b1d8b3a4c8b4569",
+    "username": "usuario123",
+    "rating": 4.5,
+    "comment": "Muy buen producto, la batería dura bastante.",
+    "id": "67e1a672567da5eeb6d61a30",
+    "createdAt": "2025-03-24T18:37:38Z",
+    "updatedAt": null
+}</code></p>
+<div class="imageblock">
+<div class="content">
+<img src="images/postman-add-review.png" alt="postman add review">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Obtener los comentarios de un producto:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Método: <code>GET</code></p>
+</li>
+<li>
+<p>URL: <code><a href="http://localhost:8000/api/reviews?productId=67e1a595567da5eeb6d61a2f" class="bare">http://localhost:8000/api/reviews?productId=67e1a595567da5eeb6d61a2f</a></code></p>
+</li>
+<li>
+<p>Respuesta esperada: Lista de comentarios en formato JSON</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Actualizar un comentario:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Método: <code>PUT</code></p>
+</li>
+<li>
+<p>URL: <code><a href="http://localhost:8000/api/reviews/67e1a672567da5eeb6d61a30" class="bare">http://localhost:8000/api/reviews/67e1a672567da5eeb6d61a30</a></code></p>
+</li>
+<li>
+<p>Cuerpo: <code>{
+    "productId": "67e1a595567da5eeb6d61a2f",
+    "userId": "60c72b2f9b1d8b3a4c8b4569",
+    "username": "usuario123",
+    "rating": 4.0,
+    "comment": "Muy buen producto, la batería dura bastante."
+}</code></p>
+</li>
+<li>
+<p>Respuesta esperada: <code>{
+    "productId": "67e1a595567da5eeb6d61a2f",
+    "userId": "60c72b2f9b1d8b3a4c8b4569",
+    "username": "usuario123",
+    "rating": 4.0,
+    "comment": "Muy buen producto, la batería dura bastante.",
+    "id": "67e1a6fa567da5eeb6d61a31",
+    "createdAt": "2025-03-24T18:39:54Z",
+    "updatedAt": "2025-03-24T18:42:32Z"
+}</code></p>
+<div class="imageblock">
+<div class="content">
+<img src="images/postman-update-review.png" alt="postman update review">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Eliminar un comentario:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Método: <code>DELETE</code></p>
+</li>
+<li>
+<p>URL: <code><a href="http://localhost:8000/api/reviews/67e1a672567da5eeb6d61a30" class="bare">http://localhost:8000/api/reviews/67e1a672567da5eeb6d61a30</a></code></p>
+</li>
+<li>
+<p>Respuesta esperada: <code>{
+    "message": "Review deleted"
+}</code></p>
+<div class="imageblock">
+<div class="content">
+<img src="images/postman-delete-review.png" alt="postman delete review">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Eliminar un producto:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Método: <code>DELETE</code></p>
+</li>
+<li>
+<p>URL: <code><a href="http://localhost:8000/api/products/67e1a595567da5eeb6d61a2f" class="bare">http://localhost:8000/api/products/67e1a595567da5eeb6d61a2f</a></code></p>
+</li>
+<li>
+<p>Respuesta esperada: <code>{"message": "Product and associated reviews deleted"}</code></p>
+<div class="imageblock">
+<div class="content">
+<img src="images/postman-delete-product.png" alt="postman delete product">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Eliminar una categoría:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Método: <code>DELETE</code></p>
+</li>
+<li>
+<p>URL: <code><a href="http://localhost:8000/api/categories/67e1a445567da5eeb6d61a2d" class="bare">http://localhost:8000/api/categories/67e1a445567da5eeb6d61a2d</a></code></p>
+</li>
+<li>
+<p>Respuesta esperada: <code>{"message": "Category deleted"}</code></p>
+<div class="imageblock">
+<div class="content">
+<img src="images/postman-delete-category.png" alt="postman delete category">
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>## Documentación de la API</p>
+</div>
+<div class="paragraph">
+<p>FastAPI proporciona una interfaz de documentación automática para la API REST, que se genera automáticamente a partir de los modelos de datos y las rutas definidas en la aplicación. La documentación de la API incluye información detallada sobre los endpoints, los parámetros de entrada, los códigos de respuesta y los modelos de datos utilizados. Esta documentación es muy útil para los desarrolladores que consumen la API, ya que les permite comprender rápidamente cómo interactuar con los diferentes endpoints y qué datos esperar en las respuestas. Además, la documentación de la API se actualiza automáticamente a medida que se modifican las rutas y los modelos de datos en la aplicación.</p>
+</div>
+<div class="paragraph">
+<p>FastAPI utiliza Swagger UI y ReDoc para generar la documentación de la API. Swagger UI proporciona una interfaz interactiva para explorar y probar los endpoints de la API, mientras que ReDoc genera una documentación más legible y visualmente atractiva. Ambas interfaces son accesibles a través de un navegador web y permiten a los desarrolladores interactuar con la API de forma sencilla y eficiente.</p>
+</div>
+<div class="paragraph">
+<p>Para acceder a la documentación de la API, abre un navegador web y navega a la URL <code><a href="http://localhost:8000/docs" class="bare">http://localhost:8000/docs</a></code> para Swagger UI o <code><a href="http://localhost:8000/redoc" class="bare">http://localhost:8000/redoc</a></code> para ReDoc. A continuación se muestra la documentación de la API generada automáticamente para Swagger UI.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/swagger-ui-finished.png" alt="swagger ui finished">
+</div>
+</div>
+<div class="paragraph">
+<p>A continuación se muestra la documentación de la API generada automáticamente para ReDoc.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/redoc-finished.png" alt="redoc finished">
+</div>
+</div>
+<div class="paragraph">
+<p>## Conclusiones</p>
+</div>
+<div class="paragraph">
+<p>En este tutorial, se ha desarrollado una API REST para la gestión de usuarios, productos, categorías y comentarios de una tienda en línea utilizando FastAPI y MySQL. A lo largo del proceso, hemos configurado un entorno de desarrollo con Docker y Docker Compose, implementado los endpoints necesarios para la API REST y probado la API con Postman.</p>
+</div>
+<div class="paragraph">
+<p>MySQL es una excelente opción para almacenar datos estructurados, como se ha observado en los usuarios, productos, categorías y comentarios. La combinación de FastAPI y MySQL permite desarrollar aplicaciones web rápidas y eficientes con una arquitectura RESTful. Además, las características de validación de datos de Pydantic y la generación automática de documentación de FastAPI facilitan el desarrollo y la documentación de la API.</p>
+</div>
+<div class="paragraph">
+<p>Este proyecto no sólo proporciona una solución funcional para la gestión de productos, categorías y comentarios, sino que también sirve como punto de partida para desarrollar aplicaciones web más complejas y escalables. Se pueden añadir más funcionalidades a la API, como la autenticación de usuarios, la gestión de pedidos y la integración con pasarelas de pago.</p>
+</div>
+<div class="paragraph">
+<p>## Licencia</p>
+</div>
+<div class="paragraph">
+<p>Licencia CC BY-NC-ND 4.0</p>
+</div>
+<div class="paragraph">
+<p>Copyright (c) 2025 [Manuel Torres - Departamento de Informática - Universidad de Almería]</p>
+</div>
+<div class="paragraph">
+<p>Este proyecto está licenciado bajo la Licencia CC BY-NC-ND 4.0. Esto significa que puedes compartir el proyecto siempre que cites al autor, no lo uses para fines comerciales y no realices obras derivadas.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2025-11-12 20:55:00 +0100
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+</body>
+</html>
