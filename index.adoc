@@ -18,14 +18,14 @@ Nombre y título del trabajo
 # Desarrollo de una API REST para gestión de productos y valoraciones con FastAPI y MySQL
 Departamento de Informática. Manuel Torres <mtorres@ual.es>
 
-image::images/di.png[]
+image::di.png[]
 
 // NO CAMBIAR!! (Entrar en modo no numerado de apartados)
 :numbered!: 
 
 [abstract]
 == Resumen
-Este proyecto tiene como objetivo desarrollar una API REST eficiente y escalable para la gestión de productos y valoraciones en un entorno de comercio electrónico. Utilizando el framework FastAPI y MySQL, se busca proporcionar una solución flexible y robusta que permita a los desarrolladores crear aplicaciones modernas y de alto rendimiento. MySQL, con su capacidad de gestión de datos y su alto nivel de utilización en aplicaciones web, es una elección ideal para este tipo de proyectos. La implementación de esta API no solo facilitará la gestión de usuarios, productos y categorías, sino que también mejorará la experiencia del usuario al permitir la consulta y gestión de valoraciones y comentarios. Con un entorno de desarrollo configurado mediante Docker y Docker Compose, este proyecto ofrece una base sólida para futuras expansiones y mejoras. Con fines didácticos, se proporcionan ejemplos prácticos de uso de MySQL con Python y FastAPI, así como la interacción con la base de datos tanto mediante SQL directamente como a través de SQLAlchemy como ORM.
+Este proyecto tiene como objetivo desarrollar una API REST eficiente y escalable para la gestión de productos y valoraciones en un entorno de comercio electrónico. Utilizando el framework FastAPI y MySQL, se busca proporcionar una solución flexible y robusta que permita a los desarrolladores crear aplicaciones modernas y de alto rendimiento. MySQL, con su capacidad de gestión de datos y su alto nivel de utilización en aplicaciones web, es una elección ideal para este tipo de proyectos. La implementación de esta API no solo facilitará la gestión de usuarios, productos, categorías y valoraciones, sino que también mejorará la experiencia del usuario al permitir la consulta y gestión de valoraciones y comentarios. Con un entorno de desarrollo configurado mediante Docker y Docker Compose, este proyecto ofrece una base sólida para futuras expansiones y mejoras. Con fines didácticos, se proporcionan ejemplos prácticos de uso de MySQL con Python y FastAPI, así como la interacción con la base de datos tanto mediante SQL directamente como a través de SQLAlchemy como ORM.
 
 ////
 COLOCA A CONTINUACION LOS OBJETIVOS
@@ -36,12 +36,17 @@ COLOCA A CONTINUACION LOS OBJETIVOS
 * Configurar un entorno de desarrollo utilizando Docker y Docker Compose.
 * Implementar endpoints para la creación, consulta, actualización y eliminación de usuarios, productos, categorías y valoraciones.
 * Proporcionar ejemplos prácticos de uso de MySQL con Python y FastAPI.
-* Interactuar con la base de datos MySQL utilizando SQL directamente y mediante SQLAlchemy como ORM.
+* Interactuar con la base de datos MySQL utilizando SQL directamente.
 * Realizar pruebas de la API utilizando Postman.
 
 [TIP]
 ====
-Disponible el https://github.com/ualmtorres/FastAPIMySQLAPIProductosValoraciones.git[repositorio de GitHub] con el código fuente de la API REST.
+Disponible el https://github.com/ualmtorres/FastAPIMySQLAPIProductosValoraciones.git[repositorio de GitHub] con el código fuente de la API REST. En el <<Anexo. Instrucciones de instalación>> se muestra cómo clonar el repositorio y configurar el entorno de desarrollo para ejecutar la API REST.
+====
+
+[NOTE]
+====
+El repositorio incopora una pequeña aplicación de gestión que utiliza la propia API del tutorial. En el `docker-compose.yml` se encuentra el puerto que utiliza de forma predeterminada (p.e. `80`).
 ====
 
 :numbered:
@@ -52,40 +57,275 @@ En el contexto del comercio electrónico, la experiencia del usuario no solo dep
 
 MySQL, como sistema de gestión de bases de datos relacional, ofrece una estructura robusta y eficiente para manejar datos estructurados, siendo una opción popular para aplicaciones web y comercio electrónico. En este tutorial se desarrollará una API REST que gestione usuarios, productos, categorías y valoraciones en un entorno de comercio electrónico.
 
-## Descrición del problema
+## Descripción del problema
 
 En este proyecto se va a desarrollar una API REST utilizando MySQL para gestionar usuarios, productos, categorías y valoraciones en un entorno de comercio electrónico utilizando el framework de Python https://fastapi.tiangolo.com/[FastAPI] y MySQL. La API debe permitir:
+
 * La gestión de usuarios, incluyendo su creación, actualización, eliminación y consulta.
 * La gestión de productos, incluyendo su creación, actualización, eliminación y consulta.
 * La organización de productos en categorías con una estructura flexible.
 * La gestión de valoraciones y comentarios de los usuarios sobre los productos.
 * La consulta eficiente de productos con sus valoraciones agregadas.
 
-## Configuración del entorno de desarrollo
+## Bases del desarrollo de APIs
 
-Para configurar el entorno de desarrollo de la API REST, utilizaremos Docker y Docker Compose. El archivo `docker-compose.yml` define los servicios necesarios para ejecutar la aplicación, incluyendo MySQL y un contenedor de Python para ejecutar la API REST.
+Una API (Application Programming Interface) es un conjunto de definiciones y protocolos que permiten que diferentes aplicaciones se comuniquen entre sí. Las APIs definen la forma en que los desarrolladores pueden interactuar con una aplicación o servicio, proporcionando un conjunto de funciones y procedimientos que pueden ser utilizados para realizar tareas específicas.
 
-A continuación se muestra el contenido del archivo `docker-compose.yml`:
+Las APIs funcionan como intermediarios entre diferentes sistemas, permitiendo que una aplicación solicite datos o servicios de otra aplicación y reciba una respuesta. Esto se logra mediante el uso de solicitudes y respuestas HTTP, donde una aplicación envía una solicitud a una API y la API devuelve una respuesta con los datos solicitados.
 
+### API y API REST
+
+Una API REST (Representational State Transfer) es un tipo de API que sigue los principios de la arquitectura REST. REST es un estilo de arquitectura que utiliza HTTP para realizar operaciones CRUD (Create, Read, Update, Delete) en recursos. En nuestro caso, los recursos normalmente serán tablas de una base de datos. Las APIs RESTful son diseñadas para ser simples, escalables y eficientes, utilizando métodos HTTP estándar y formatos de intercambio de datos como JSON y XML.
+
+La principal diferencia entre una API y una API REST es que las APIs RESTful siguen los principios de la arquitectura REST, mientras que otras APIs pueden no seguir estos principios. Las APIs RESTful utilizan métodos HTTP estándar (GET, POST, PUT, DELETE) para realizar operaciones en recursos y utilizan URLs para identificar recursos específicos.
+
+La figura siguiente ilustra las peticiones a una API RESTful utilizando los métodos HTTP estándar GET, POST, PUT y DELETE. Estas peticiones son enviadas a través de URLs que identifican los recursos específicos. Al ser recibidas por la API RESTful, se procesan (interactuando con la base de datos) y se envían las respuestas correspondientes.
+
+image::api-rest.png[]
+
+.Importancia de las APIs en el contexto de las bases de datos
+****
+Desde el punto de vista de las bases de datos, estamos interesados en desarrollar APIs que permitan a las aplicaciones web interactuar con bases de datos. En este sentido, las APIs RESTful son un enfoque común para desarrollar APIs que permiten a las aplicaciones web realizar operaciones CRUD (Create, Read, Update, Delete) en bases de datos. Este enfoque permite a los desarrolladores interactuar con las bases de datos de forma sencilla y eficiente utilizando métodos HTTP estándar y formatos de intercambio de datos como JSON y XML sin necesidad de interactuar con la base de datos a través de consultas ejecutadas desde un cliente SQL. Además, ocultan los detalles de implementación de la base de datos y proporcionan una capa de abstracción que facilita el desarrollo de aplicaciones web. Por ejemplo, la URL siguiente permite recuperar el producto 1 de una base de datos mediante una API RESTful sin conocer los detalles de implementación de la base de datos. 
+
+http://api.example.com/product/1
+
+Al realizar la petición, no se conoce si la base de datos es MySQL, PostgreSQL, MongoDB, etc., ni cómo se almacenan los datos en la base de datos. La API RESTful proporciona una interfaz sencilla y estandarizada para interactuar con la base de datos.
+
+Posteriormente, se podrían realizar cambios en la tecnología subyacente de la base de datos (p.e. cambiar de DBMS) o en la forma en que se almacenan los datos (cambiar el modelo de datos) sin afectar a las aplicaciones web que utilizan la API RESTful. Bastaría con modificar la implementación interna de la API RESTful para adaptarse a los cambios en la base de datos manteniendo la misma interfaz (contrato) para el cliente, es decir, manteniedo la estructura de las URLs y los métodos HTTP. Este enfoque facilita la evolución de las aplicaciones web y la escalabilidad del sistema proporcionando una capa de abstracción entre las aplicaciones web y la base de datos.
+
+Desde el punto de vista de la seguridad, la API puede ser protegida mediante autenticación y autorización, lo que permite controlar el acceso a los recursos y proteger los datos de la base de datos. Por ejemplo, se pueden utilizar tokens de acceso (JWT) para autenticar a los usuarios y roles para autorizar el acceso a los recursos. De esta forma, se puede garantizar que sólo los usuarios autorizados puedan acceder a los datos de la base de datos y realizar operaciones en los recursos.
+****
+
+### Métodos HTTP (GET, POST, PUT, DELETE)
+
+Los métodos HTTP son utilizados para realizar operaciones en recursos en una API RESTful. Los métodos más comunes y sus principales usos son:
+
+* `GET`: Recupera información de un recurso específico.
+* `POST`: Crea un nuevo recurso.
+* `PUT`: Actualiza un recurso existente.
+* `DELETE`: Elimina un recurso.
+
+Cada uno de estos métodos tiene un propósito específico y se utiliza en diferentes situaciones para interactuar con los recursos de una API. Desde el punto de vista de bases de datos, cada uno lo podríamos hacer corresponder con una operación básica de SQL CRUD:
+
+* `GET`: Correspondería a una operación `SELECT` para recuperar información de un recurso específico.
+* `POST`: Correspondería a una operación `INSERT` para crear un nuevo recurso.
+* `PUT`: Correspondería a una operación `UPDATE` para actualizar un recurso existente.
+* `DELETE`: Correspondería a una operación `DELETE` para eliminar un recurso.
+
+### Formatos de intercambio de datos (JSON, XML)
+
+Los formatos de intercambio de datos son utilizados para representar la información que se envía y recibe a través de una API. Los dos formatos más comunes son JSON (JavaScript Object Notation) y XML (eXtensible Markup Language).
+
+* `JSON`: Es un formato ligero y fácil de leer que utiliza una sintaxis basada en objetos de JavaScript. Es ampliamente utilizado en APIs RESTful debido a su simplicidad y eficiencia.
++
+[source,json]
+----
+[
+    {
+        "id": 1,
+        "name": "Product 1",
+        "price": 10.00
+    },
+    {
+        "id": 2,
+        "name": "Product 2",
+        "price": 20.00
+    }
+]
+----
+* `XML`: Es un formato más complejo que utiliza una sintaxis basada en etiquetas. Aunque es más pesado que JSON, es utilizado en algunas APIs debido a su capacidad para representar datos estructurados de manera más detallada.
++
+[source,xml]
+----
+<products>
+    <product>
+        <id>1</id>
+        <name>Product 1</name>
+        <price>10.00</price>
+    </product>
+    <product>
+        <id>2</id>
+        <name>Product 2</name>
+        <price>20.00</price>
+    </product>
+</products>
+----
+
+### Especificación de los endpoints de una API
+
+Los endpoints de una API son las URLs a las que se envían las solicitudes para interactuar con los recursos de la API. Cada endpoint representa una operación específica que se puede realizar en un recurso. Como ejemplos de endpoints, se pueden mencionar:
+
+* `GET /product`: Recupera la lista de todos los productos.
+* `GET /product/{id}`: Recupera la información de un producto específico.
+* `POST /product`: Crea un nuevo producto. El producto se envía en el cuerpo de la solicitud, normalmente en formato JSON o XML.
+
+A continuación se explican algunos aspectos importantes sobre cómo especificar los endpoints de una API.
+
+#### Paso de parámetros en la URL
+
+Los parámetros en la URL se utilizan para identificar recursos específicos o para pasar información adicional a la API. Los parámetros pueden ser parte de la ruta de la URL o pueden ser parámetros de consulta.
+
+* **Parámetros en la ruta de la URL**: Se utilizan para identificar recursos específicos. Por ejemplo, en la URL `http://api.example.com/product/1`, el parámetro `1` identifica al prducto con ID 1. En la especificación de una API, esto se puede representar como `GET /product/{id}`, donde se omite el nombre del servidor y sólo se especifica la ruta relativa al servidor. 
+* **Parámetros de consulta**: También conocidos como `QueryParams`, se utilizan para pasar información adicional a la API. Por ejemplo, en la URL `http://api.example.com/product?name=Product 1`, el parámetro de consulta `name=Product 1` se utiliza para buscar productos con el nombre "Product 1". En la especificación de una API, esto se puede representar como `GET /product?name=<name>`.
+
+#### Envío de datos en peticiones POST y PUT
+
+En las peticiones POST y PUT, los datos a añadir o a modificar, respectivamente, se envían en el cuerpo de la solicitud (`body`). Estos datos pueden estar en formato JSON, XML u otros formatos. A continuación se muestra un ejemplo del cuerpo en una petición POST utilizando JSON:
+
+```json
+{
+    "name": "Product 1",
+    "price": 10.00
+}
+```
+
+La figura siguiente ilustra cómo especificar este cuerpo en una solicitud `POST` a través de Postman.
+
+$$$
+image::postman-post.png[]
+
+[NOTE]
+====
+La especificación del cuerpo se realiza en la pestaña `Body` de Postman. En este caso se ha seleccionado el formato `raw` y se ha introducido el cuerpo en formato JSON seleccionando `JSON` en el menú desplegable.
+====
+
+En este ejemplo se envían los datos de un producto en formato JSON en el cuerpo de la solicitud POST. En la especificación de una API, esto se puede representar como `POST /product`.
+
+En el caso de una petición `PUT`, se enviarían los datos de la misma forma, pero se utilizaría el método `PUT` en lugar de `POST`. En la especificación de una API, esto se puede representar como `PUT /product/{id}`.
+
+[NOTE]
+====
+Las peticiones `POST` no incluyen un identificador en la URL. Sólo se incorpora en el cuerpo de la solicitud la información necesaria para crear un nuevo recurso. De la generación del identificador se encarga el servidor. En términos de base de datos, sería el campo `id` de la tabla y sería generado automáticamente por el sistema de gestión de base de datos. Por otro lado, las peticiones `PUT` sí incluyen un identificador en la URL, ya que se es necesario para identificar el recurso que se va a modificar.
+====
+
+#### Respuestas de la API
+
+Las respuestas de una API RESTful pueden ser en formato JSON, XML u otros formatos. Es una buena práctica que las respuestas, además incluyan un código de estado HTTP que indica si la solicitud se ha completado correctamente o si ha habido algún error. Algunos códigos de estado HTTP comunes son:
+
+* `200 OK`: La solicitud se ha completado correctamente.
+* `201 Created`: El recurso se ha creado correctamente. Se utiliza en respuestas a peticiones `POST`.
+* `204 No Content`: La solicitud se ha completado correctamente pero no se devuelve contenido en la respuesta. Se utiliza en respuestas a peticiones `PUT` o `DELETE`.
+* `400 Bad Request`: La solicitud no se ha podido procesar debido a un error en la solicitud.
+* `404 Not Found`: El recurso solicitado no se ha encontrado. Esto debería entenderse un recurso que no se ha encontrado (p.e. un producto que no existe).
+
+#### Ejemplo de endpoints de una API RESTful
+
+A continuación se muestra un ejemplo de cómo se pueden especificar los endpoints básicos de una API RESTful para gestionar productos:
+
+* `GET /product`: Recupera la lista de todos los productos.
+* `GET /product/{id}`: Recupera la información de un producto específico.
+* `POST /product`: Crea un nuevo producto.
+* `PUT /product/{id}`: Actualiza la información de un producto específico.
+* `DELETE /product/{id}`: Elimina un producto específico.
+
+En estos endpoints, `{id}` es un parámetro en la ruta de la URL que identifica al usuario específico.
+
+[NOTE]
+====
+En la especificación de los endpoints de una API normalmente no se incluye el nombre/dirección del servidor, ya que esto se especifica en la configuración del cliente. Sólo se especifica la ruta relativa al servidor. Por ejemplo, en lugar de `GET http://api.example.com/product`, se especificaría `GET /product`.
+====
+
+### Cabeceras (Content-Type, Authorization)
+
+Las cabeceras HTTP son utilizadas para proporcionar información adicional sobre la solicitud o la respuesta. Algunas de las cabeceras más comunes son:
+
+* `Content-Type`: Especifica el formato de los datos en el cuerpo de la solicitud o la respuesta (p.e. `application/json` para JSON).
+* `Authorization`: Proporciona credenciales de autenticación para acceder a recursos protegidos (p.e. `Bearer token` para autenticación basada en tokens).
+
+Las cabeceras son importantes para asegurar que la solicitud y la respuesta sean interpretadas correctamente por el cliente y el servidor.
+
+## Configuración inicial del entorno de desarrollo
+
+Para configurar el entorno de desarrollo de la API REST, utilizaremos Docker y Docker Compose. El archivo `docker-compose.yml` define los servicios necesarios para ejecutar la aplicación, incluyendo MySQL y un contenedor de Python para ejecutar la API REST. La figura siguiente muestra un diagrama de la arquitectura del entorno de desarrollo, incluyendo los servicios de Docker y cómo se comunican entre sí y con el host. Podemos ver que el contenedor de Python que ejecuta la API REST se comunica con el contenedor de MySQL para acceder a la base de datos, y que el host puede acceder a ambos servicios a través de los puertos expuestos. También se muestra cómo se utilizan los volúmenes para montar el código fuente de la API REST y los datos de MySQL en el contenedor, lo que facilita el desarrollo y la persistencia de los datos.
+
+
+[mermaid,target=docker-architecture,format=svg]
+----
+flowchart TB
+
+%% =========================
+%% HOST
+%% =========================
+subgraph HOST["Host (Desarrollo Local)"]
+
+subgraph PROJECT["Proyecto Local"]
+api_src["📁 ../api"]
+mysql_data_src["📁 ../data/mysql-data"]
+end
+
+browser["🌐 Navegador"]
+workbench["🛠️ MySQL Workbench"]
+
+end
+
+%% =========================
+%% DOCKER
+%% =========================
+subgraph DOCKER["Docker Compose Network"]
+
+subgraph PYTHON["Contenedor python"]
+py_app["📁 /app"]
+fastapi["🐍 FastAPI + Uvicorn<br/>:8000"]
+end
+
+subgraph MYSQL["Contenedor mysql"]
+mysql_store["📁 /var/lib/mysql"]
+mysql["🗄️ MySQL 8.0<br/>:3306"]
+end
+
+end
+
+%% =========================
+%% VOLUMES
+%% =========================
+api_src <-->|bind mount| py_app
+mysql_data_src <-->|bind mount| mysql_store
+
+%% =========================
+%% INTERNAL COMMS
+%% =========================
+fastapi -->|SQL| mysql
+
+%% =========================
+%% HOST ACCESS
+%% =========================
+browser -->|localhost:8000/docs| fastapi
+workbench -->|localhost:3306| mysql
+
+%% =========================
+%% DEPENDENCIES
+%% =========================
+PYTHON -. depends_on<br/>healthy .-> MYSQL
+----
+
+### Preparación del entorno de desarrollo con Docker Compose
+
+Docker Compose es una herramienta que permite definir y ejecutar aplicaciones Docker con múltiples contenedores. Con Docker Compose, se puede configurar el entorno de desarrollo de la API REST definiendo los servicios necesarios en un archivo `docker-compose.yml`. Este archivo especifica cómo se deben construir y ejecutar los contenedores de Docker para la aplicación, incluyendo las dependencias entre los servicios, los volúmenes para persistencia de datos y el mapeo de puertos para acceder a los servicios desde el host. Comencemos con un archivo `docker-compose.yml` básico, que por ahora define únicamente los servicios de MySQL y Python para la API REST. Este archivo lo situaremos en una carpeta denominada `setup-environment` que se encuentra en la raíz del proyecto y se utiliza para configurar y ejecutar los contenedores de Docker necesarios para la aplicación.
+
+[NOTE]
+====
+Posteriormente añadiremos un tercer servicio para ejecutar una aplicación que interactúe con la API REST, que se desarrollará utilizando el framework de Python https://streamlit.io/[Streamlit]. Este servicio se encargará de ejecutar una aplicación web que permita a los usuarios interactuar con la API REST de manera visual e intuitiva, facilitando la consulta de productos, categorías y valoraciones, así como la gestión de usuarios y productos. La aplicación Streamlit se desarrollará en la carpeta `app` y se ejecutará en un contenedor de Docker separado, que se comunicará con el contenedor de Python que ejecuta la API REST para obtener los datos necesarios.
+====
+
+.Archivo `setup-environment/docker-compose.yml`
 [source,yaml]
 ----
-version: "3"
 services:
   mysql:
     container_name: mysql
     image: mysql:8.0
     restart: always
     ports:
-      - 3306:3306
+      - 3306:3306 <1>
     volumes:
-      - "../data/mysql-data:/var/lib/mysql"
-    environment:
+      - "../data/mysql-data:/var/lib/mysql" <2>
+    environment: <3>
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       MYSQL_DATABASE: "${MYSQL_DATABASE}"
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
-    healthcheck:
-      test:
+    healthcheck: 
+      test: <4>
         [
           "CMD",
           "mysqladmin",
@@ -102,33 +342,66 @@ services:
   python:
     depends_on:
       mysql:
-        condition: service_healthy
+        condition: service_healthy <5>
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile <6>
     volumes:
-      - "../:/app"
+      - "../api:/app" <7>
     ports:
-      - "8000:8000"
+      - "8000:8000" <8>
 ----
+<1> Expone el puerto 3306 del contenedor de MySQL para que pueda ser accedido desde el host o desde otros contenedores.
+<2> Utiliza un volumen para almacenar los datos de la base de datos, mapeando el directorio `data/mysql-data` del host al directorio `/var/lib/mysql` en el contenedor. Esto asegura que los datos de la base de datos se mantengan persistentes incluso si el contenedor se detiene o se elimina.
+<3> Define las variables de entorno necesarias para configurar MySQL, como el nombre de usuario, la contraseña y la base de datos iniciales.
+<4> Configura un healthcheck para el servicio de MySQL, que verifica periódicamente si el servicio está listo para aceptar conexiones. Esto es importante para asegurar que el contenedor de Python que ejecuta la API REST no intente conectarse a MySQL antes de que esté listo.
+<5> Configura el servicio de Python para que dependa del servicio de MySQL y espere a que el servicio de MySQL esté preparado antes de iniciar.
+<6> Especifica el contexto de construcción y el archivo Dockerfile para construir la imagen del contenedor de Python. El contexto representa el directorio actual, y el Dockerfile se encuentra en la misma carpeta `setup-environment`.
+<7> Monta la carpeta `api` del host en el directorio `/app` del contenedor de Python. Esto permite que los cambios realizados en el código fuente de la API REST se reflejen inmediatamente en el contenedor sin necesidad de reconstruir la imagen. Esto es especialmente útil durante la fase de desarrollo, ya que permite iterar rápidamente y ver los cambios sin tener que esperar a que se reconstruya la imagen de Docker cada vez que se realiza una modificación en el código.
+<8> Expone el puerto 8000 del contenedor de Python para que la API REST pueda ser accedida desde el host o desde otros contenedores.
 
-Se utiliza un archivo `.env` para definir las variables de entorno necesarias para la configuración de MySQL. A continuación se muestra el contenido del archivo `.env`:
+[NOTE]
+====
+Al estar usando un volumen en nuestro host para almacenar el código de la aplicación y que esté mapeado en el contenedor, podemos editar el código fuente de la API REST en nuestro equipo, mientras que el contenedor se encarga de facilitar la ejecución de la aplicación con todas las dependencias necesarias. Esto facilita enormemente el proceso de desarrollo y mejora la productividad, ya que no es necesario reconstruir la imagen de Docker cada vez que se realiza un cambio en el código. Además, al estar ejecutando uvicorn en modo de recarga automática (`--reload`), cualquier cambio en el código fuente se reflejará inmediatamente en la aplicación sin necesidad de reiniciar manualmente el servidor. Esto es especialmente útil durante la fase de desarrollo, ya que permite iterar rápidamente y ver los cambios sin tener que esperar a que se reconstruya la imagen de Docker cada vez que se realiza una modificación en el código.
+====
 
+Se utiliza un archivo `.env` para definir las variables de entorno necesarias para la configuración de MySQL. Este archivo lo situamos en la misma carpeta `setup-environment` que el archivo `docker-compose.yml`. A continuación se muestra un ejemplo del contenido del archivo `.env` con las variables de entorno necesarias para configurar MySQL:
+
+.Archivo `setup-environment/.env`
 [source,bash]
 ----
 MYSQL_USER=example
 MYSQL_PASSWORD=example
 MYSQL_HOST=mysql
+MYSQL_PORT=3306
 MYSQL_DATABASE=mydatabase
 ----
 
-El archivo `Dockefile` se utiliza para construir el contenedor de Python con las dependencias necesarias para ejecutar la API REST. A continuación se muestra el contenido del archivo `Dockerfile`:
+[NOTE]
+====
+Es una práctica común no incluir el archivo `.env` en los repositorios de código fuente por motivos de seguridad, ya que puede contener información sensible como contraseñas y credenciales de acceso a la base de datos. En su lugar, se suele proporcionar un archivo de ejemplo (`.env.example`) con el mismo formato pero sin valores sensibles, que los desarrolladores pueden copiar y renombrar a `.env` para configurar sus propias variables de entorno.
+====
 
+Este entorno inicial de desarrollo incluye dos servicios:
+
+* **mysql**: Servicio de bases de datos relacional que se utiliza para almacenar los usuarios, productos, categorías y valoraciones. Se expone con el nombre `mysql` en el puerto 3306 y utiliza un volumen para almacenar los datos de la base de datos que mapea el directorio `data/mysql-data` al directorio `/var/lib/mysql` en el contenedor. Mediante el uso de variables de entorno, se configura con un nombre de usuario, una contraseña y una base de datos iniciales para la autenticación y el acceso a los datos.
+* **python**: Contenedor de Python para ejecutar la API REST. Se construye a partir de un archivo `Dockerfile,` que instala las dependencias necesarias y expone el puerto 8000. Las dependencias se definen en un archivo `requirements.txt` que se copia al contenedor durante la construcción. Para poder desarrollar la API REST de manera eficiente, se monta la carpeta de la aplicación en el contenedor para facilitar el desarrollo. Esto permite que los cambios realizados en el código fuente de la aplicación se reflejen inmediatamente en el contenedor sin necesidad de reconstruir la imagen.
+
+[TIP]
+====
+Una técnica muy utilizada en el desarrollo con Docker consiste en montar una carpeta del host en el contenedor para facilitar el desarrollo. En esta carpeta se va creando el código fuente de la aplicación, y al montarla en el contenedor, los cambios realizados en el código fuente se reflejan inmediatamente en el contenedor sin necesidad de reconstruir la imagen. Esto es especialmente útil durante la fase de desarrollo, ya que permite iterar rápidamente y ver los cambios sin tener que esperar a que se reconstruya la imagen de Docker cada vez que se realiza una modificación en el código. Así, el código está a salvo en el host y se puede editar con cualquier editor de texto o IDE, mientras que el contenedor se encarga de facilitar la ejecución de la aplicación con todas las dependencias necesarias. Esto facilita enormemente el proceso de desarrollo y mejora de la productividad. En el repositorio no sólo incluimos el código fuente de la API REST, sino también el entorno de desarrollo con Docker y Docker Compose para que los desarrolladores puedan configurar fácilmente su entorno y comenzar a trabajar en la API REST sin complicaciones. Esto evita tener que instalar en el host, lo que a veces contamina el entorno o lo hace incompatible con otras aplicaciones. Además, al usar Docker, se garantiza que el entorno de desarrollo sea consistente en diferentes máquinas y sistemas operativos, lo que facilita la colaboración entre desarrolladores y la implementación en producción.
+====
+
+Usaremos un archivo `Dockerfile` para construir el contenedor de Python con las dependencias necesarias para ejecutar la API REST. A continuación se muestra el contenido del archivo `Dockerfile`:
+
+.Archivo `setup-environment/Dockerfile`
 [source,docker]
 ----
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 WORKDIR /app
+
+ENV PYTHONPATH=/app
 
 COPY ./requirements.txt /tmp/requirements.txt
 
@@ -145,13 +418,12 @@ Como archivo de requisitos, se utiliza `requirements.txt` para instalar las depe
 
 [source,bash]
 ----
-fastapi==0.95.2                 # Framework para construir APIs REST
-uvicorn==0.22.0                 # Servidor ASGI para ejecutar aplicaciones FastAPI
-sqlalchemy==2.0.23              # ORM para interactuar con bases de datos SQL
-mysql-connector-python==8.1.0   # Conector de MySQL para Python
+fastapi==0.136.1                # Framework para construir APIs REST
+uvicorn==0.44.0                 # Servidor ASGI para ejecutar aplicaciones FastAPI
+mysql-connector-python==9.6.0   # Conector de MySQL para Python
 dotenv==0.9.9                   # Carga de variables de entorno desde un archivo .env
-pydantic==1.10.7                # Biblioteca de validación de datos y serialización de objetos
-pytz==2024.1                    # Biblioteca para manejar zonas horarias
+pydantic==2.13.3                # Biblioteca de validación de datos y serialización de objetos
+pytz==2026.1                    # Biblioteca para manejar zonas horarias
 ----
 
 ### Servicios
@@ -159,38 +431,449 @@ pytz==2024.1                    # Biblioteca para manejar zonas horarias
 - **mysql**: Servicio de bases de datos relacional que se utiliza para almacenar los usuarios, productos, categorías y valoraciones. Se expone con el nombre `mysql` en el puerto 3306 y utiliza un volumen para almacenar los datos de la base de datos que mapea el directorio `data/mysql-data` al directorio `/var/lib/mysql` en el contenedor. Se configura con un nombre de usuario, una contraseña y una base de datos iniciales para la autenticación y el acceso a los datos.
 - **python**: Contenedor de Python para ejecutar la API REST. Se construye a partir de un archivo `Dockerfile,` que instala las dependencias necesarias y expone el puerto 8000. Se monta la carpeta de la aplicación en el contenedor para facilitar el desarrollo.
 
-### Instrucciones de instalación
+### FastAPI
 
-Para instalar y ejecutar la aplicación, sigue estos pasos:
+FastAPI es un framework moderno y de alto rendimiento para construir una APIs REST utilizando Python. Está diseñado para ser fácil de usar, rápido y eficiente, aprovechando las características más recientes de Python, como las anotaciones de tipo (_type hints_). Algunas de sus características principales incluyen:
 
-1. Clona el repositorio:
-+
-```bash
-git clone https://github.com/ualmtorres/FastAPIMySQLAPIProductosValoraciones.git
-cd FastAPIMySQLAPIProductosValoraciones
+* Alto rendimiento: Basado en Starlette y Pydantic, lo que lo hace extremadamente rápido.
+* Validación automática: Utiliza las anotaciones de tipo para validar automáticamente las entradas y salidas.
+* Documentación automática: Genera automáticamente documentación interactiva para las APIs. Genera documentación https://swagger.io/[Swagger] y https://redoc.ly/[ReDoc].
+* Asincronía: Soporta programación asíncrona con `async` y `await`.
+
+### Swagger y ReDoc
+
+https://swagger.io/[Swagger] y https://redoc.ly/[ReDoc] son herramientas de documentación de APIs que permiten visualizar y probar las rutas de la API de forma interactiva. FastAPI genera automáticamente documentación interactiva para las APIs en formato Swagger y ReDoc. La documentación se genera automáticamente a partir de las anotaciones de tipo y los esquemas definidos en el código. Los esquemas de datos se utilizan para validar las entradas y salidas de las rutas de la API y los definiremos utilizando https://pydantic-docs.helpmanual.io/[Pydantic]. Pydantic es una biblioteca de validación de datos y serialización de objetos que se integra perfectamente con FastAPI.
+
+La documentación Swagger generada está disponible en la ruta `/docs` de la aplicación FastAPI. Es posible cambiar el título y la descripción de la documentación de Swagger utilizando los parámetros `title` y `description` al crear la aplicación FastAPI. Esto lo veremos más adelante cuando comencemos con el desarrollo.
+
+Por otro lado, ReDoc es otra herramienta de documentación que presenta las rutas de la API de manera más estructurada y profesional. Está disponible en la ruta `/redoc`.
+
+Ambas herramientas son generadas automáticamente por FastAPI a partir de las anotaciones de tipo y los esquemas definidos en el código. Esto elimina la necesidad de escribir documentación manualmente y asegura que siempre esté sincronizada con la implementación de la API.
+
+### Organización del código
+
+Para mantener el código organizado y facilitar el desarrollo, se recomienda dividir la aplicación en módulos y archivos separados. En FastAPI, se pueden definir las rutas y la lógica de negocio en módulos separados, y luego importarlos en el archivo principal de la aplicación. Esto facilita la gestión de rutas y la escalabilidad de la aplicación. A continuación se muestra una propuesta de organización de código en FastAPI.
+
 ```
-2. Ejecuta Docker Compose para levantar los servicios:
-+
-```bash
-docker-compose up -d
+FastAPIMySQLAPIProductosValoraciones/
+│
+├── __init__.py         # Archivo de inicialización. Puede estar vacío. Permite que Python trate el directorio como un paquete.
+├── .env                # Archivo de variables de entorno
+├── .env.example        # Archivo de ejemplo de variables de entorno
+├── create_data.sh      # Script con llamadas a la API para la inicialización de la base de datos
+├── database.py         # Configuración de la base de datos
+├── init_db.py          # Script para inicializar la base de datos
+├── main.py             # Archivo principal de la aplicación
+├── models.py           # Definición de modelos Pydantic
+├── routes/             # Directorio de rutas
+│   ├── base.py         # Rutas básicas (raíz, salud, etc.)
+│   ├── categories.py   # Rutas para categorías
+│   ├── products.py     # Rutas para productos
+│   ├── reviews.py      # Rutas para valoraciones
+│   ├── users.py        # Rutas para usuarios
 ```
-+
+
+### El archivo `main.py` básico
+
+Para comenzar nuestra API desde cero, crearemos un archivo `main.py` con el siguiente código. Este archivo es el punto de entrada de la aplicación FastAPI y define la aplicación y una ruta de prueba para verificar que la API está funcionando correctamente. Por ahora, este archivo sólo contiene la definición de la aplicación FastAPI con una descripción personalizada.
+
+.Archivo `./api/main.py`
+[source,python]
+----
+from fastapi import FastAPI
+
+app = FastAPI(
+    title="Products API",
+    description="API for managing products using FastAPI and MySQL",
+    version="1.0.0"
+)
+----
+
+### Creación de las rutas básicas de prueba
+
+Antes de pasar a la implementación de la lógica de negocio y la interacción con la base de datos, vamos a crear algunas rutas básicas de prueba para asegurarnos de que la API REST está funcionando correctamente. Estas rutas se pueden utilizar para verificar que el servidor está respondiendo a las solicitudes y que la configuración inicial es correcta.
+
+Organizaremos todas nuestras rutas en archivos separados dentro de una carpeta `routers` para mantener el código organizado. Para comenzar, crearemos un archivo `routers/base.py` con el siguiente código, que define una ruta de prueba para verificar que la API REST está funcionando correctamente.
+
+.Archivo `./api/routers/base.py`
+[source,python]
+----
+from fastapi import APIRouter
+
+router = APIRouter()
+
+# Define a test API endpoint
+@router.get("/health", status_code=status.HTTP_200_OK)  <1>
+async def health_check(): <2>
+    return {"status": "ok"} <3>
+----
+<1> Define una ruta GET en el router con la ruta `/health` que se utilizará para verificar el estado de la API REST. Se especifica un código de estado HTTP 200 OK para indicar que la solicitud se ha procesado correctamente.
+<2> Define una función asíncrona `health_check` que se ejecutará cuando se realice una solicitud GET a la ruta `/health`.
+<3> Devuelve un diccionario JSON con el estado de la API REST, indicando que está funcionando correctamente.
+
 [NOTE]
 ====
-Si necesitas volver a construir las imágenes de Docker (por ejemplo, si has realizado cambios en el archivo `Dockerfile`), puedes usar el siguiente comando:
-```bash
-docker-compose up -d --build
-```
-3. Accede a la documentación de la API REST en `http://localhost:8000/docs` (Swagger) o `http://localhost:8000/redoc` (Redoc).
-4. Accede a los endpoints de la API REST en `http://localhost:8000/api`.
+Es conveniente definir rutas de prueba como esta para verificar que la configuración inicial de la API REST es correcta y que el servidor está respondiendo a las solicitudes. Esto es especialmente útil durante la fase de desarrollo, ya que permite asegurarse de que la aplicación está funcionando correctamente antes de implementar la lógica de negocio y la interacción con la base de datos. Además, estas rutas de prueba pueden ser utilizadas para realizar pruebas automatizadas y monitorizar el estado de la API REST en producción.
+====
 
-Con estos pasos, tendrás el entorno de desarrollo configurado y la API REST en funcionamiento.
+.Códigos de estado HTTP comunes
+****
+
+Los códigos de estado HTTP son una parte fundamental de cualquier API REST, ya que indican el resultado de una solicitud y proporcionan información sobre el estado de la respuesta. En https://developer.mozilla.org/en-US/docs/Web/HTTP/Status[MDN Web Docs] se pueden encontrar los códigos de estado HTTP más comunes y su significado. Aquí se muestra una tabla con los códigos de estado HTTP que usaremos para cuando respondamos a una consulta de petición de datos (`GET`), que usaremos en consultas con `SELECT` a la base de datos, o para cuando respondamos a una consulta de creación de datos (`POST`), que usaremos en consultas con `INSERT` a la base de datos, `PUT` para consultas con `UPDATE` a la base de datos, o `DELETE` para consultas con `DELETE` a la base de datos. Esta tabla se puede utilizar como referencia para elegir el código de estado HTTP adecuado al responder a las solicitudes en la API REST.
+
+[cols="1,1,1", options="header"]
+|===
+| Código de estado HTTP | Valor Fastify | Descripción
+| 200 OK | `status.HTTP_200_OK` | La solicitud se ha procesado correctamente y se ha devuelto la respuesta esperada (`SELECT`).
+| 201 Created | `status.HTTP_201_CREATED` | La solicitud se ha procesado correctamente y se ha creado un nuevo recurso (`INSERT`).
+| 204 No Content | `status.HTTP_204_NO_CONTENT` | La solicitud se ha procesado correctamente pero no se devuelve contenido en la respuesta (`UPDATE` o `DELETE`).
+| 404 Not Found | `status.HTTP_404_NOT_FOUND` | El recurso solicitado no se ha encontrado en la base de datos (`SELECT` con un ID que no existe).
+| 409 Conflict | `status.HTTP_409_CONFLICT` | La solicitud no se puede procesar debido a un conflicto con el estado actual del recurso (por ejemplo, intentar crear un recurso que ya existe o actualizar un recurso que ha sido modificado por otro proceso).
+| 422 Unprocessable Entity | `status.HTTP_422_UNPROCESSABLE_ENTITY` | La solicitud es válida pero no se puede procesar debido a errores de validación (por ejemplo, datos de entrada que no cumplen con los requisitos de validación definidos en los modelos de Pydantic).
+|===
+
+****
+
+Luego, en el archivo `main.py`, importamos el router definido en `routers/base.py` y lo incluimos en la aplicación FastAPI para que la ruta de prueba esté disponible. A continuación se muestra el código actualizado del archivo `main.py` con la inclusión del router:
+
+.Archivo `./api/main.py`
+[source,python]
+----
+# from routes import base
+from fastapi import FastAPI
+from routes import base <1>
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="Products API",
+    description="API for managing products using FastAPI and MySQL",
+    version="1.0.0"
+)
+
+app.include_router(base.router) <2>
+----
+<1> Importa el router definido en `routers/base.py` para que las rutas definidas en ese archivo estén disponibles en la aplicación FastAPI.
+<2> Incluye el router en la aplicación FastAPI utilizando el método `include_router`. Esto hace que las rutas definidas en `routers/base.py` estén disponibles en la API REST, lo que permite acceder a la ruta de prueba `/health` para verificar que la API está funcionando correctamente.
+
+Si ejecutamos el entorno de desarrollo con Docker Compose y accedemos a `http://localhost:8000/health`, deberíamos recibir una respuesta JSON con el estado de la API REST, indicando que está funcionando correctamente. Esto confirma que la configuración inicial del entorno de desarrollo es correcta y que la API REST está respondiendo a las solicitudes.
+
+image::health.png[]
+
+### HATEOAS
+
+HATEOAS (Hypermedia as the Engine of Application State) es un principio de diseño de APIs REST que sugiere que las respuestas de la API no deben incluir sólo datos, sino también enlaces a otros recursos relacionados, lo que permite a los clientes navegar por la API de manera dinámica y descubrir nuevas funcionalidades sin necesidad de conocer previamente la estructura de la API. En este tutorial, se realizará una implementación muy básica de HATEOAS en la API REST para proporcionar enlaces a recursos relacionados en las respuestas de la API. Esto mejorará la experiencia del usuario al permitir una navegación más intuitiva y facilitará la exploración de la API sin necesidad de consultar la documentación para conocer las rutas disponibles.
+
+Para ello, definiremos en la ruta raíz (`/`) un endpoint que devuelva un mensaje de bienvenida junto con enlaces a los recursos principales de la API REST. Más adelante, a medida que implementemos los endpoints para gestionar usuarios, productos, categorías y valoraciones, también incluiremos enlaces a recursos relacionados en las respuestas de esos endpoints para seguir el principio de HATEOAS. Esto permitirá a los clientes descubrir fácilmente cómo interactuar con la API REST y navegar por los diferentes recursos disponibles.
+A continuación se muestra un ejemplo de cómo implementar mínimamente HATEOAS en la ruta raíz de la API REST:
+
+.Archivo `./api/routers/base.py`
+[source,python]
+----
+from fastapi import APIRouter, status, Request <1>
+
+router = APIRouter()
+
+# Define the root endpoint with HATEOAS links
+@router.get("/") <2>
+async def root(request: Request):
+    base = str(request.base_url).rstrip("/") <3>
+
+    return {
+        "message": "Welcome to Products API",
+        "_links": {
+            "self": f"{base}/",
+            "health": f"{base}/health",
+            "docs": f"{base}/docs",
+            "redoc": f"{base}/redoc",
+            "openapi": f"{base}/openapi.json",
+        }
+    }
+
+# Define a test API endpoint
+@router.get("/health", status_code=status.HTTP_200_OK)
+async def health_check():
+    return {"status": "ok"}
+----
+<1> Importa la clase `Request` de FastAPI para poder acceder a la información de la solicitud, como la URL base.
+<2> Define una ruta GET en el router con la ruta raíz (`/`) que se utilizará para proporcionar un mensaje de bienvenida junto con enlaces a recursos relacionados.
+<3> Obtiene la URL base de la solicitud utilizando `request.base_url` y elimina cualquier barra diagonal al final para construir los enlaces correctamente.
+
+En la respuesta de esta ruta raíz, se incluye un mensaje de bienvenida y un diccionario `_links` que contiene enlaces a recursos relacionados, como:
+
+* la ruta de salud (`/health`)
+* la documentación de Swagger (`/docs`)
+* la documentación de Redoc (`/redoc`)
+* el esquema OpenAPI (`/openapi.json`)
+
+Esto permite a los clientes descubrir fácilmente cómo interactuar con la API REST y navegar por los diferentes recursos disponibles sin necesidad de consultar la documentación para conocer las rutas disponibles. Así se mostraría la respuesta JSON al acceder a la ruta raíz (`/`):
+
+image::root.png[]
+
+Ahora podemos ir navegando por la API REST utilizando los enlaces proporcionados en la respuesta de la ruta raíz, lo que facilita la exploración de la API y mejora la experiencia del usuario al interactuar con la API REST. Por ejemplo, al hacer clic sobre el enlace de Swagger (`/docs`), se accederá a la documentación interactiva de la API REST, donde se pueden probar los diferentes endpoints y ver cómo funcionan. De esta manera, se sigue el principio de HATEOAS al proporcionar enlaces a recursos relacionados en las respuestas de la API REST, lo que permite a los clientes navegar por la API de manera dinámica y descubrir nuevas funcionalidades sin necesidad de conocer previamente la estructura de la API.
+
+image::docs.png[]
+
+Igualmente, al hacer clic sobre el enlace de Redoc (`/redoc`), se accederá a otra versión de la documentación de la API REST con un formato diferente, lo que ofrece a los usuarios una experiencia de navegación más rica y variada. 
+
+image::redoc.png[]
+
+Esto demuestra cómo la implementación de HATEOAS en la API REST mejora la experiencia del usuario al permitir una navegación más intuitiva y facilitar la exploración de la API sin necesidad de consultar la documentación para conocer las rutas disponibles.
+
+## Configuración de la base de datos MySQL
+
+Una vez configurado el entorno de desarrollo, el siguiente paso es preparar la base de datos para que podamos almacenar los datos de usuarios, productos, categorías y valoraciones. Esto implica preparar la conexión a la base de datos MySQL desde la API REST y crear las tablas necesarias para almacenar los datos. En esta sección se muestra cómo configurar la conexión a MySQL utilizando un pool de conexiones y cómo crear las tablas necesarias para la API REST.
+
+### Conexión a la base de datos MySQL
+
+Para conectar la API REST a la base de datos MySQL, se puede utilizar el conector de MySQL para Python. Esto permite interactuar con la base de datos MySQL directamente desde el código Python. Sin embargo, para mejorar el rendimiento y la eficiencia en la gestión de conexiones a la base de datos, es recomendable utilizar un pool de conexiones. A continuación se muestra un ejemplo de cómo configurar la conexión a MySQL utilizando un pool de conexiones. Este código se puede colocar en un archivo `database.py` que se encargue de gestionar la conexión a MySQL y proporcionar una función para obtener una conexión desde el pool.
+
+[NOTE]
+====
+Un pool de conexiones es una técnica que permite reutilizar conexiones a la base de datos en lugar de abrir y cerrar una conexión cada vez que se realiza una consulta. Esto reduce la sobrecarga asociada con la creación y destrucción de conexiones, lo que mejora el rendimiento de la aplicación.
+====
+
+.Archivo `./api/database.py`
+[source,python]
+----
+import mysql.connector 
+from mysql.connector import pooling
+import os
+from dotenv import load_dotenv
+
+load_dotenv() <1>
+
+_DB_HOST = os.environ.get('MYSQL_HOST') <2>
+_DB_PORT = int(os.getenv("MYSQL_PORT", 3306))
+_DB_USER = os.environ.get('MYSQL_USER')
+_DB_PASSWORD = os.environ.get('MYSQL_PASSWORD')
+_DB_NAME = os.environ.get('MYSQL_DATABASE', 'mydatabase')
+
+# Ensure the database exists before creating the pool (needed on fresh volumes)
+_tmp = mysql.connector.connect( <3>
+    host=_DB_HOST,
+    port=_DB_PORT,
+    user=_DB_USER,
+    password=_DB_PASSWORD,
+)
+_tmp.cursor().execute(f"CREATE DATABASE IF NOT EXISTS `{_DB_NAME}`") <4>
+_tmp.close() <5>
+
+_pool = pooling.MySQLConnectionPool( <6>
+    pool_name="main_pool",
+    pool_size=5,
+    host=_DB_HOST,
+    port=_DB_PORT,
+    user=_DB_USER,
+    password=_DB_PASSWORD,
+    database=_DB_NAME,
+)
+
+def get_connection(): <7>
+    return _pool.get_connection()
+
+def get_db(): <8>
+    conn = _pool.get_connection()
+    try:
+        yield conn
+    finally:
+        conn.close()
+----
+<1> Carga las variables de entorno desde el archivo `.env` utilizando la biblioteca `dotenv`.
+<2> Obtiene las variables de entorno necesarias para configurar la conexión a MySQL, como el host, el puerto, el usuario, la contraseña y el nombre de la base de datos.
+<3> Establece una conexión temporal a MySQL para asegurarse de que la base de datos existe antes de crear el pool de conexiones. Esto es necesario en caso de que se esté utilizando un volumen nuevo para MySQL que no tenga la base de datos creada.
+<4> Ejecuta una sentencia SQL para crear la base de datos si no existe. Esto garantiza que la base de datos esté disponible para el pool de conexiones.
+<5> Cierra la conexión temporal después de asegurarse de que la base de datos existe.
+<6> Configura el pool de conexiones a MySQL utilizando las variables de entorno para la configuración de la conexión.
+<7> Define una función `get_connection` que devuelve una conexión del pool de conexiones.
+<8> Define una función `get_db` que se puede utilizar como dependencia en las rutas de FastAPI para obtener una conexión a la base de datos. Esta función utiliza un generador para asegurar que la conexión se cierre correctamente después de su uso.
+
+[NOTE]
+====
+Un generador es una función que permite iterar sobre un conjunto de valores utilizando la palabra clave `yield`. En este caso, la función `get_db` es un generador que obtiene una conexión del pool de conexiones y la devuelve con `yield`. Después de que la conexión se haya utilizado en la ruta de FastAPI, el bloque `finally` asegura que la conexión se cierre correctamente, lo que es crucial para evitar fugas de conexiones y garantizar el buen funcionamiento del pool de conexiones. Al utilizar esta función como una dependencia en las rutas de FastAPI, se puede obtener una conexión a la base de datos de manera eficiente y segura, asegurando que las conexiones se gestionen adecuadamente. Esto es especialmente importante en aplicaciones con un alto volumen de solicitudes, donde la gestión eficiente de las conexiones a la base de datos es fundamental para el rendimiento y la escalabilidad de la aplicación.
+====
+
+### Inicialización de la base de datos
+
+El ejemplo que vamos a usar a lo largo del tutorial es una base de datos para gestionar productos y valoraciones en un entorno de comercio electrónico. Los productos se organizan en categorías, y los usuarios pueden dejar valoraciones y comentarios sobre los productos. La figura siguiente muestra en formato PlantUML el esquema de la base de datos que vamos a utilizar para almacenar los datos de usuarios, productos, categorías y valoraciones.
+
+image::erd.png[Hello, World!]
+
+```plantuml
+@startuml
+hide circle
+hide methods
+skinparam linetype ortho
+
+class "users" {
+  id : int <<PK>>
+  --
+  username : varchar255
+  email : varchar255
+}
+class "categories" {
+  id : int <<PK>>
+  --
+  name : varchar255
+  description : text
+  parentId : int <<FK>>
+}
+class "products" {
+  id : int <<PK>>
+  --
+  name : varchar255
+  description : text
+  price : double
+  categoryId : int <<FK>>
+}
+class "reviews" {
+  id : int <<PK>>
+  --
+  productId : int <<FK>>
+  userId : int <<FK>>
+  rating : double
+  comment : text
+}
+users ||..o{ reviews : "1:N"
+categories ||..o{ products : "1:N"
+categories ||..o{ categories: "0::N"
+products ||..o{ reviews : "1:N"
+@enduml
+```
+
+
+A continuación se muestra el código para crear las tablas `users`, `categories`, `products` y `reviews` en la base de datos MySQL utilizando sentencias SQL. Colocaremos este código en un archivo 'init_db.py' que se encargue de la inicialización de la base de datos. Este código se ejecutará al inicio de la aplicación para asegurarse de que las tablas necesarias estén creadas en la base de datos antes de que se realicen operaciones sobre ellas.
+
+.Archivo `./api/init_db.py`
+[source, python]
+----
+from database import get_connection
+import logging
+
+logger = logging.getLogger("uvicorn") <1>
+
+# Create tables if they don't exist (plain DDL, no ORM)
+CREATE_TABLES_SQL = [ <2>
+    """
+    CREATE TABLE IF NOT EXISTS users (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        username    VARCHAR(255) NOT NULL UNIQUE,
+        email       VARCHAR(255) NOT NULL UNIQUE
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS categories (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        name        VARCHAR(255) NOT NULL,
+        description TEXT,
+        parentId    INT, <3>
+        FOREIGN KEY (parentId) REFERENCES categories(id) ON DELETE SET NULL <4>
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS products (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        name        VARCHAR(255) NOT NULL,
+        description TEXT,
+        price       DOUBLE NOT NULL,
+        categoryId  INT, <5>
+        FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE SET NULL <6>
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS reviews (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        productId   INT NOT NULL,
+        userId      INT NOT NULL,
+        rating      DOUBLE NOT NULL,
+        comment     TEXT,
+        FOREIGN KEY (productId) REFERENCES products(id) ON DELETE CASCADE, <7>
+        FOREIGN KEY (userId) REFERENCES users(id) ON DELETE RESTRICT <8>
+    )
+    """,
+]
+
+# Initialize database tables
+def create_tables(): <9>
+    conn = get_connection() <10>
+    try:
+        cursor = conn.cursor() <11>
+        for sql in CREATE_TABLES_SQL: <12>
+            cursor.execute(sql) <13>
+        conn.commit() <14>
+        logger.info("Tablas creadas/verificadas correctamente") <15>
+    except Exception:
+        logger.exception("Error al crear tablas") <16>
+        raise <17>
+    finally:
+        conn.close() <18>
+----
+<1> Configura un logger para registrar información sobre la creación de tablas y posibles errores.
+<2> Define las sentencias SQL para crear las tablas `users`, `categories`, `products` y `reviews` si no existen. Estas tablas incluyen claves foráneas para establecer relaciones entre usuarios, productos, categorías y valoraciones.
+<3> `parentId` es una clave foránea que permite establecer una relación jerárquica entre categorías, donde una categoría puede tener una categoría padre. **Admite valores nulos** para permitir categorías sin padre (categorías raíz).
+<4> Se especifica que si se elimina una categoría padre, el valor de `parentId` en las categorías hijas se establecerá en NULL, lo que evita la eliminación en cascada de las categorías hijas.
+<5> `categoryId` es una clave foránea que hace referencia a la tabla `categories`. **Admite valores nulos** para permitir productos sin categoría asignada.
+<6> Se especifica que si se elimina una categoría, el valor de `categoryId` en los productos asociados se establecerá en NULL, lo que evita la eliminación en cascada de los productos.
+<7> Se especifica que si se elimina un producto, todas las valoraciones asociadas a ese producto se eliminarán en cascada, lo que garantiza la integridad referencial entre productos y valoraciones.
+<8> Se especifica que si se intenta eliminar un usuario que tiene valoraciones asociadas, la eliminación será restringida, lo que evita la eliminación de usuarios que tienen valoraciones en la base de datos y garantiza la integridad referencial entre usuarios y valoraciones
+<9> Define una función `create_tables` que se encargue de ejecutar las sentencias SQL para crear las tablas en la base de datos.
+<10> Obtiene una conexión a la base de datos utilizando la función `get_connection` definida anteriormente.
+<11> Crea un cursor para ejecutar las sentencias SQL.
+<12> Itera sobre las sentencias SQL definidas en `CREATE_TABLES_SQL` y las ejecuta utilizando el cursor.
+<13> Ejecuta cada sentencia SQL para crear las tablas en la base de datos.
+<14> Realiza un commit para guardar los cambios en la base de datos después de ejecutar las sentencias SQL.
+<15> Registra un mensaje de información indicando que las tablas se han creado o verificado correctamente.
+<16> Si ocurre una excepción durante la creación de las tablas, se registra un mensaje de error con la información de la excepción.
+<17> Se vuelve a lanzar la excepción para que pueda ser manejada por el código que llama a esta función.
+<18> Finalmente, se cierra la conexión a la base de datos para liberar los recursos.
+
+[NOTE]
+====
+Un logger es una herramienta que permite registrar mensajes de información, advertencia y error en una aplicación. En este caso, se utiliza el logger de Uvicorn para registrar mensajes relacionados con la creación de tablas en la base de datos. Esto es útil para monitorear el proceso de inicialización de la base de datos y detectar posibles problemas. Es preferible utilizar un logger en lugar de imprimir mensajes directamente en la consola, ya que los loggers ofrecen más flexibilidad y opciones de configuración para el manejo de mensajes. Además, los loggers permiten registrar mensajes en diferentes niveles (info, warning, error) y pueden configurarse para escribir los mensajes en archivos de log o enviarlos a sistemas de monitorización, lo que facilita la gestión y el análisis de los registros de la aplicación.
+====
+
+[NOTE]
+====
+Un cursor es un objeto que se utiliza para ejecutar sentencias SQL y recuperar resultados de la base de datos. En este caso, se crea un cursor a partir de la conexión a la base de datos para ejecutar las sentencias SQL definidas en `CREATE_TABLES_SQL`. El cursor se utiliza para ejecutar cada sentencia SQL en un bucle, y después de ejecutar todas las sentencias, se realiza un commit para guardar los cambios en la base de datos. Finalmente, el cursor y la conexión se cierran para liberar los recursos. Por tanto, y de manera sencilla, un cursor es una herramienta que permite interactuar con la base de datos a través de la ejecución de sentencias SQL y la recuperación de resultados. La diferencia entre un cursor y una conexión es que la conexión es el canal de comunicación con la base de datos, mientras que el cursor es el objeto que se utiliza para ejecutar sentencias SQL y manejar los resultados de esas sentencias. En resumen, la conexión establece la comunicación con la base de datos, mientras que el cursor se encarga de ejecutar las operaciones SQL y gestionar los resultados.
+====
+
+Ahora, ya sólo queda ejecutar la función `create_tables` al inicio de la aplicación para asegurarnos de que las tablas necesarias estén creadas en la base de datos antes de que se realicen operaciones sobre ellas. Para ello, podemos importar la función `create_tables` en el archivo `main.py` y llamarla al inicio de la aplicación. A continuación se muestra el código actualizado del archivo `main.py` con la llamada a la función `create_tables`:
+
+.Archivo `./api/main.py`
+[source,python]
+----
+# from routes import base
+from fastapi import FastAPI
+from routes import base
+from init_db import create_tables <1>
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="Products API",
+    description="API for managing products using FastAPI and MySQL",
+    version="1.0.0"
+)
+
+@app.on_event("startup") <2>
+def startup():
+    create_tables() <3>
+
+app.include_router(base.router)
+----
+<1> Importa la función `create_tables` desde el módulo `init_db` para que pueda ser llamada al inicio de la aplicación.
+<2> Utiliza el decorador `@app.on_event("startup")` para registrar una función que se ejecutará automáticamente cuando la aplicación FastAPI se inicie. Esto asegura que la función `create_tables` se ejecute cada vez que se inicie la aplicación, lo que garantiza que las tablas necesarias estén creadas en la base de datos antes de que se realicen operaciones sobre ellas.
+<3> Llama a la función `create_tables` dentro de la función de inicio para crear las tablas en la base de datos si no existen. Esto asegura que la base de datos esté preparada para almacenar los datos de usuarios, productos, categorías y valoraciones que se gestionarán a través
+
+Si ahora lanzamos una petición a la raíz de la API REST en `http://localhost:8000`, se ejecutará el código de inicialización de la base de datos y se crearán las tablas `users`, `categories`, `products` y `reviews` si no existen. Esto asegura que la base de datos esté preparada para almacenar los datos de usuarios, productos, categorías y valoraciones que se gestionarán a través de la API REST. Una vez lanzada esta petición, podemos abrir una sesión en MySQL o utilizar una herramienta como MySQL Workbench para verificar que las tablas se han creado correctamente en la base de datos. Usaremos las credenciales definidas en el archivo `.env` para conectarnos a la base de datos MySQL y verificar que las tablas `users`, `categories`, `products` y `reviews` han sido creadas correctamente. Al abrir la conexión a la base de datos, deberíamos ver estas tablas listadas en el esquema de la base de datos, lo que confirma que la inicialización de la base de datos se ha realizado correctamente.
+
+image::showtables.png[]
 
 ## Desarrollo de la API
 
 En esta sección vamos a crear la API REST para gestionar usuarios, productos, categorías y valoraciones utilizando el framework FastAPI y MySQL. Seguiremos un enfoque incremental, comenzando con la configuración general y luego desarrollando cada endpoint paso a paso. Antes, vamos a describir los endpoints disponibles en la API REST.
 
 ### Especificación de los endpoints de la API
+
+Los endpoints representan las rutas a las que los clientes pueden enviar solicitudes para interactuar con la API REST. A continuación se muestra una descripción de los endpoints disponibles en la API REST para gestionar usuarios, productos, categorías y valoraciones:
 
 * Usuarios
     ** `POST /api/users`: Crear un nuevo usuario.
@@ -207,7 +890,6 @@ En esta sección vamos a crear la API REST para gestionar usuarios, productos, c
 * Categorías
     ** `POST /api/categories`: Crear una nueva categoría.
     ** `GET /api/categories`: Obtener todas las categorías.
-    ** `GET /api/categories/tree`: Obtener la jerarquía completa de categorías.
     ** `GET /api/categories/{id}`: Obtener una categoría por ID.
     ** `PUT /api/categories/{id}`: Actualizar una categoría por ID.
     ** `DELETE /api/categories/{id}`: Eliminar una categoría por ID.
@@ -220,8 +902,17 @@ En esta sección vamos a crear la API REST para gestionar usuarios, productos, c
 #### Ejemplo de JSON de un usuario
 ```json
 {
-    "username": "usuario123",
-    "email": "usuario123@example.com"
+    "username": "ursula",
+    "email": "ursula@acme.com"
+}
+```
+#### Ejemplo de JSON de una categoría
+
+```json
+{
+    "name": "Electronics", 
+    "description": "Dispositivos electrónicos", 
+    "parentId": null
 }
 ```
 
@@ -229,20 +920,10 @@ En esta sección vamos a crear la API REST para gestionar usuarios, productos, c
 
 ```json
 {
-    "name": "Producto 1",
-    "description": "Descripción del producto 1",
-    "price": 100,
-    "categoryId": "60c72b2f9b1d8b3a4c8b4567"
-}
-```
-
-#### Ejemplo de JSON de una categoría
-
-```json
-{
-    "name": "Categoría 1",
-    "description": "Descripción de la categoría 1",
-    "parentId": "60c72b2f9b1d8b3a4c8b4567"
+    "name": "Laptop Dell", 
+    "description": "Laptop potente para trabajo", 
+    "price": 1200.0, 
+    "categoryId": "1"
 }
 ```
 
@@ -250,305 +931,112 @@ En esta sección vamos a crear la API REST para gestionar usuarios, productos, c
 
 ```json
 {
-    "productId": "60c72b2f9b1d8b3a4c8b4567",
-    "userId": "60c72b2f9b1d8b3a4c8b4567",
-    "username": "usuario123",
-    "rating": 4.5,
-    "comment": "Muy buen producto, la batería dura bastante."
+    "rating": 5,
+    "comment": "Excelente laptop, muy rápida",
+    "productId": 1,
+    "userId": 1
 }
 ```
+### Clases Pydantic para modelos de datos
 
-### Crear la aplicación FastAPI
+Los modelos de datos representan la estructura de los datos que se manejan en la API REST. Esto es, los modelos de datos definen cómo se representan los usuarios, productos, categorías y valoraciones en la API REST. Esto es importante para validar los datos de entrada y salida de las rutas de la API, asegurando que los datos cumplen con la estructura esperada y facilitando la generación automática de documentación a través de Swagger. En FastAPI, se utiliza https://pydantic.dev/docs/validation/latest/get-started/[Pydantic], una biblioteca de validación de datos que permite definir modelos de datos utilizando clases de Python. FastAPI utiliza estas
+clases Pydantic para definir los modelos de datos, lo que permite validar automáticamente los datos de entrada y salida de las rutas de la API. Por ejemplo, el modelo `Product` se utiliza para validar los datos de un producto y el modelo `ProductResponse` se utiliza para devolver los datos de un producto con su ID. Para definir las clases usaremos la especificación de los JSON que se ha hecho en la sección <<Especificación de los endpoints de la API>>. Definiremos también clases de respuesta para los modelos de datos, que incluyen el ID generado por la base de datos.
 
-FastAPI es un framework moderno y de alto rendimiento para construir una APIs REST utilizando Python. Está diseñado para ser fácil de usar, rápido y eficiente, aprovechando las características más recientes de Python, como las anotaciones de tipo (_type hints_). Algunas de sus características principales incluyen:
-
-* Alto rendimiento: Basado en Starlette y Pydantic, lo que lo hace extremadamente rápido.
-* Validación automática: Utiliza las anotaciones de tipo para validar automáticamente las entradas y salidas.
-* Documentación automática: Genera automáticamente documentación interactiva para las APIs. Genera documentación https://swagger.io/[Swagger] y https://redoc.ly/[ReDoc].
-* Asincronía: Soporta programación asíncrona con `async` y `await`.
-
-Para instalar FastAPI es necesario Python 3.7 o superior. A continuación se indican los pasos para instalar FastAPI y un servidor ASGI (por ejemplo, Uvicorn) y verificar la instalación. Un servidor ASGI es un servidor web que puede manejar conexiones asíncronas y es necesario para ejecutar aplicaciones FastAPI.
-
-[NOTE]
-====
-**Instalación de FastAPI**
-
-Para crear una API REST con FastAPI es necesario instalar el framework y un servidor ASGI. El entorno de desarrollo que estamos usando en este tutorial ya lo tiene configurado, pero si no estuvieran instalados bastaría instalarlos con
-
-```bash
-pip install "fastapi[standard]"
-pip install uvicorn
-```
-====
-
-Para comenzar a desarrollar la API REST con FastAPI, basta con crear un archivo `main.py` con el siguiente código y ejecutar el servidor Uvicorn, si no se ha hecho ya (En el caso de usar el entorno con Docker del tutorial, el servidor Uvicorn ya se está ejecutando en el contenedor de Python):
-
-```python
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/")
-async def read_root():
-    return {"message": "Hello, World!"}
-```
-
-Si se opta por ejecutar el servidor Uvicorn en local, se pone en marcha con el siguiente comando:
-
-```bash
-uvicorn main:app --reload 
-```
-
-El servidor Uvicorn se estaría ejecutando en modo de recarga automática. Por tanto, cada vez que se realice un cambio en el código, el servidor se reiniciará automáticamente y se aplicarán los cambios. Si se abre un navegador y se accede a `http://localhost:8000`, se debería ver el mensaje "Hello, World!".
-
-image::images/hello-world.png[Hello, World!]
-
-El servidor Uvicorn se ejecuta en el puerto 8000 por defecto. Si se desea usar otro puerto, se puede especificar con el parámetro `--port`. El siguiente comando ejecuta el servidor Uvicorn en el puerto 8000 con recarga automática.
-
-```bash
-uvicorn main:app --reload --port 8000
-```
-
-### Swagger y ReDoc
-
-https://swagger.io/[Swagger] y https://redoc.ly/[ReDoc] son herramientas de documentación de APIs que permiten visualizar y probar las rutas de la API de forma interactiva. FastAPI genera automáticamente documentación interactiva para las APIs en formato Swagger y ReDoc. La documentación se genera automáticamente a partir de las anotaciones de tipo y los esquemas definidos en el código. Los esquemas de datos se utilizan para validar las entradas y salidas de las rutas de la API y los definiremos utilizando https://pydantic-docs.helpmanual.io/[Pydantic]. Pydantic es una biblioteca de validación de datos y serialización de objetos que se integra perfectamente con FastAPI.
-
-La documentación Swagger generada está disponible en la ruta `/docs` de la aplicación FastAPI. La figura siguiente muestra la página de documentación de Swagger.
-
-image::images/swagger-ui.png[Swagger UI]
-
-Es posible cambiar el título y la descripción de la documentación de Swagger utilizando los parámetros `title` y `description` al crear la aplicación FastAPI. Por ejemplo, se pueden hacer los siguientes cambios en el archivo `main.py`:
-
-```python
-app = FastAPI(
-    title="Products and Reviews API",
-    description="API for managing products and reviews using FastAPI and MySQL",
-    version="1.0.0"
-)
-```
-
-Después de este cambio, la documentación de Swagger mostrará el título y la descripción personalizados, como ilustra la figura siguiente.
-
-[image:swagger-ui-custom.png[Swagger UI personalizado]]
-
-Por otro lado, ReDoc es otra herramienta de documentación que presenta las rutas de la API de manera más estructurada y profesional. Está disponible en la ruta `/redoc`. La figura siguiente muestra la página de documentación de ReDoc.
-
-image::images/redoc.png[ReDoc]
-
-Ambas herramientas son generadas automáticamente por FastAPI a partir de las anotaciones de tipo y los esquemas definidos en el código. Esto elimina la necesidad de escribir documentación manualmente y asegura que siempre esté sincronizada con la implementación de la API.
-
-### Organización del código
-
-Para mantener el código organizado y facilitar el desarrollo, se recomienda dividir la aplicación en módulos y archivos separados. En FastAPI, se pueden definir las rutas y la lógica de negocio en módulos separados, y luego importarlos en el archivo principal de la aplicación. Esto facilita la gestión de rutas y la escalabilidad de la aplicación. A continuación se muestra una propuesta de organización de código en FastAPI.
-
-```
-FastAPIMySQLAPIProductosValoraciones/
-│
-├── __init__.py         # Archivo de inicialización. Puede estar vacío. Permite que Python trate el directorio como un paquete.
-├── .env                # Archivo de variables de entorno
-├── main.py             # Archivo principal de la aplicación
-├── requirements.txt    # Archivo de dependencias
-├── database.py         # Configuración de la base de datos
-├── models.py           # Definición de modelos Pydantic
-├── start.sh            # Script de inicio
-├── create_data.sh      # Script opcional para crear datos de prueba
-├── routes/             # Directorio de rutas
-│   ├── users.py        # Rutas para usuarios
-│   ├── products.py     # Rutas para productos
-│   ├── categories.py   # Rutas para categorías
-│   ├── reviews.py      # Rutas para valoraciones
-│   ├── test.py         # Rutas de prueba
-```
-
-### Primeros archivos
-
-A continuación se muestra el contenidos de los primeros archivos con los que arrancaremos la API. Eliminaremos la ruta (`/`) que hemos creado anteriormente a modo de prueba y añadiremos una nueva ruta de prueba (`/test`), pero ya en un archivo separado y en la carpeta `routes`.
-
-**Archivo `.env`**
-
-```python
-MYSQL_USER=example
-MYSQL_PASSWORD=example
-MYSQL_HOST=mysql
-MYSQL_DATABASE=mydatabase
-```
-
-[NOTE]
-====
-En este caso el valor de `mysql` se refiere al nombre del servicio MySQL definido en el archivo `docker-compose.yml`. Este es el mismo nombre que se utiliza en el archivo `docker-compose.yml`. Si se cuenta con un servidor MySQL en una URL específica, se puede cambiar el valor de `MYSQL_HOST` por la URL del servidor.
-====
-
-**Archivo `database.py`**
-
-```python
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-username = os.environ.get('MYSQL_USER')
-password = os.environ.get('MYSQL_PASSWORD')
-host = os.environ.get('MYSQL_HOST')
-database = os.environ.get('MYSQL_DATABASE', 'mydatabase')
-
-uri = f"mysql+mysqlconnector://{username}:{password}@{host}:3306/{database}"
-
-engine = create_engine(uri)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-# Función para obtener sesión de DB
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-```
-
-[NOTE]
-====
-La conexión a MySQL se hace a través del método `create_engine` de la biblioteca `sqlalchemy`. Se utilizan las variables de entorno definidas en el archivo `.env` para la configuración de la conexión. Una vez establecida la conexión, se crea una sesión para interactuar con la base de datos y se define la base declarativa para los modelos.
-====
-
-**Archivo `models.py`**
-
-Definimos aquí las clases Pydantic que representan los modelos de datos de la aplicación. Estos modelos se utilizan para validar los datos de entrada y salida de las rutas de la API. Por ejemplo, el modelo `Product` se utiliza para validar los datos de un producto y el modelo `ProductResponse` se utiliza para devolver los datos de un producto con su ID. Para definir las clases usaremos la especificación de los JSON que se ha hecho en la sección <<Especificación de los endpoints de la API>>.
-
-Definiremos también clases de respuesta para los modelos de datos, que incluyen el ID generado por la base de datos y otros campos adicionales como las fechas de creación y actualización.
-
-```python
+.Archivo `./api/models.py`
+[source,python]
+----
 from pydantic import BaseModel
 from typing import Optional, List
 
-class UserRequest(BaseModel):
+# Modelos Pydantic para API
+
+class User(BaseModel):
     username: str
     email: str
 
-class UserResponse(UserRequest):
+class UserResponse(User):
     id: int
-    created_at: str
 
 class Product(BaseModel):
     name: str
     description: str
     price: float
-    categoryId: str
+    categoryId: Optional[int] = None <1>
 
 class ProductResponse(Product):
-    id: str
+    id: int
 
 class Category(BaseModel):
     name: str
     description: str
-    parentId: Optional[str] = None
+    parentId: Optional[int] = None <2>
 
 class CategoryResponse(Category):
-    id: str
+    id: int
 
 class Review(BaseModel):
-    productId: str
-    userId: str
-    username: str
+    productId: int
+    userId: int
     rating: float
-    comment: str
+    comment: Optional[str] = None
 
 class ReviewResponse(Review):
-    id: str
-    createdAt: str
-    updatedAt: Optional[str] = None
-````
-
-**Archivo `routes/test.py`**
-
-```python
-from fastapi import APIRouter
-
-router = APIRouter()
-
-# Define a test API endpoint
-@router.get("/")
-async def test_api():
-    return {"message": "API is working"}
-```
-
-[NOTE]
-====
-En este archivo definimos un endpoint de prueba `GET /api/test` que devuelve un mensaje de prueba. Este endpoint se utilizará para comprobar que la API está funcionando correctamente. El código del endpoint se define en una función asíncrona que devuelve un diccionario con el mensaje "API is working".
-====
-
-**Archivo `main.py`**
-
-```python
-from fastapi import FastAPI
-from routes import test
-
-app = FastAPI()
-
-app.include_router(test.router, prefix="/api/test", tags=["test"])
-```
-
-[NOTE]
-====
-En este archivo creamos la aplicación FastAPI y añadimos el router de prueba que definimos anteriormente. El router se incluye en la aplicación con el prefijo `/api/test` y se le asigna la etiqueta `test`. Esto significa que el endpoint de prueba estará disponible en la ruta `/api/test` y se mostrará en la documentación de la API con la etiqueta `test`.
-====
-
-
-Tras esto, la API REST debería estar funcionando correctamente. Se puede probar accediendo a la URL `http://localhost:8000/api/test` en un navegador o utilizando una herramienta como Postman. También se puede probar la documentación de la API en `http://localhost:8000/docs` o `http://localhost:8000/redoc`. La respuesta debería ser un mensaje JSON con el texto "API is working". La figura siguiente ilustra la llamada al endpoint de prueba desde Swagger.
-
-image::images/test-api.png[Endpoint de prueba]
+    id: int
+----
+<1> **El campo `categoryId` en el modelo `Product` es opcional**, lo que permite crear productos sin asignarles una categoría. Esto además es necesario para cuando se elimine una categoría, ya que tenemos la columna definida con `ON DELETE SET NULL`, lo que significa que si se elimina una categoría, el valor de `categoryId` en los productos asociados se establecerá en NULL.
+<2> **El campo `parentId` en el modelo `Category` es opcional**, lo que permite crear categorías sin asignarles una categoría padre. Esto además es necesario para cuando se elimine una categoría padre, ya que tenemos la columna definida con `ON DELETE SET NULL`, lo que significa que si se elimina una categoría padre, el valor de `parentId` en las categorías hijas se establecerá en NULL.
 
 ### Endpoints de usuarios
 
-[NOTE]
-====
-Aunque el resto de endpoints se van a desarrollar con SQLAlchemy para interactuar con MySQL, el endpoint de usuarios se va a implementar utilizando consultas SQL directas para mostrar un ejemplo de cómo interactuar con MySQL sin usar un ORM. Esto puede ser útil en situaciones en las que nos queremos introducir en el desarrollo de la API REST paulatinamente aprovechando conocimientos previos de SQL, cuando se requiere un mayor control sobre las consultas SQL o cuando se quiere evitar la sobrecarga de un ORM en aplicaciones simples.
-====
+Para crear los endpoints de usuarios, deberemos hacer estas tareas:
 
-En el archivo `routes/users.py` añade el siguiente código antes de la definición de las rutas de usuarios:
+* Crear un nuevo archivo `routers/users.py` para definir las rutas relacionadas con los usuarios.
+* Añadir el enrutado de usuarios a `main.py` para que las rutas de usuarios estén disponibles en la API REST.
+* Implementar el endpoint para crear un usuario (`POST /users`).
+* Implementar el endpoint para obtener todos los usuarios (`GET /users`).
+* Implementar el endpoint para obtener un usuario por ID (`GET /users/{id}`).
+* Implementar el endpoint para actualizar un usuario por ID (`PUT /users/{id}`).
+* Implementar el endpoint para eliminar un usuario por ID (`DELETE /users/{id}`).
 
 [source,python]
 ----
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy import text
-from sqlalchemy.orm import Session
-from typing import List
-from models import UserRequest, UserResponse
+import logging
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from mysql.connector.abstracts import MySQLConnectionAbstract
 from database import get_db
+from models import User, UserResponse
 
 router = APIRouter()
+logger = logging.getLogger("uvicorn")
 
 // Los endpoints de usuarios se definen aquí
 ----
 
 #### Añadir el enrutado de usuarios a `main.py`
 
-Modificar el archivo `main.py` para incluir el enrutado de usuarios en la aplicación FastAPI. Se harán modificaciones para importar el router de usuarios y añadirlo a la aplicación con el prefijo `/api/users` y la etiqueta `users`.
+Modificar el archivo `main.py` para incluir el enrutado de usuarios en la aplicación FastAPI. Se harán modificaciones para importar el router de usuarios y añadirlo a la aplicación con el prefijo `/users` y la etiqueta `users`.
 
 [source,python]
 ----
+# from routes import base
 from fastapi import FastAPI
-from routes import test, users # Importar el router de usuarios
-from database import engine
-from sqlalchemy import text
+from routes import base, users  # Añadir importación del router de usuarios
+from init_db import create_tables
 
-# Crear tabla users si no existe
-with engine.connect() as conn:
-    conn.execute(text("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) NOT NULL UNIQUE,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    """))
-    conn.commit()
+# Initialize FastAPI app
+app = FastAPI(
+    title="Products API",
+    description="API for managing products using FastAPI and MySQL",
+    version="1.0.0"
+)
 
-app.include_router(test.router, prefix="/api/test", tags=["test"])
-app.include_router(users.router, prefix="/api/users", tags=["users"])   # Añadir el router de usuarios
+@app.on_event("startup")
+def startup():
+    create_tables()
+
+app.include_router(base.router)
+app.include_router(users.router, prefix="/users", tags=["Users"]) # Añadir el router de usuarios
 ----
 
 #### Endpoint para crear un usuario
@@ -556,608 +1044,379 @@ app.include_router(users.router, prefix="/api/users", tags=["users"])   # Añadi
 Añade el siguiente código para definir un endpoint `POST /api/users` que permite crear un nuevo usuario. Este endpoint recibe los datos del usuario en formato JSON en el cuerpo de la solicitud y los inserta en la tabla de usuarios de MySQL. En el cuerpo de la solicitud se deben proporcionar los siguientes campos: `username` y `email`. El endpoint devuelve los datos del usuario creado, incluyendo su ID generado por la base de datos. La operación SQL que se usaría para insertar un registro en la tabla de usuarios sería similar a la siguiente:
 
 ```
-INSERT INTO users (username, email) VALUES ('usuario123', 'usuario123@example.com');
+INSERT INTO users (username, email) 
+VALUES ('usuario123', 'usuario123@example.com');
 ```
 
 [source,python]
 ----
+from fastapi import APIRouter, Depends, HTTPException, status <1>
+from mysql.connector.abstracts import MySQLConnectionAbstract <2>
+from database import get_db <3>
+from models import User, UserResponse <4>
+
+router = APIRouter()
+
+# CRUD endpoints for User resource
+
 # Route to create a new user
-@router.post("/", response_model=UserResponse, status_code=201)
-async def create_user(user: UserRequest, db: Session = Depends(get_db)):
+@router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED) <5>
+async def create_user(user: User, conn: MySQLConnectionAbstract = Depends(get_db)): <6>
+
+    cursor = conn.cursor() <7>
     try:
-        result = db.execute(text("INSERT INTO users (username, email) VALUES (:username, :email)"), {"username": user.username, "email": user.email})
-        db.commit()
-        user_id = result.lastrowid
-        result_select = db.execute(text("SELECT id, username, email, created_at FROM users WHERE id = :id"), {"id": user_id})
-        row = result_select.fetchone()
-        return UserResponse(id=row[0], username=row[1], email=row[2], created_at=row[3].strftime("%Y-%m-%dT%H:%M:%SZ"))
+        cursor.execute( <8>
+            "INSERT INTO users (username, email) VALUES (%s, %s)",
+            (user.username, user.email),
+        )
+        conn.commit() <9>
     except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        conn.rollback() <10>
+        if "Duplicate entry" in str(e): <11>
+            logger.warning("POST /users - conflict: username or email already exists ('%s')", user.username) <12>
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username or email already exists")
+        logger.exception("POST /users - unexpected error creating user '%s'", user.username) <13>
+        raise
+    new_id = cursor.lastrowid <14>
+    logger.info("POST /users - created user id=%d '%s'", new_id, user.username) <15>
+    return UserResponse(id=cursor.lastrowid, **user.model_dump()) <16>
 ----
+<1> `Depends` se utiliza para declarar dependencias en FastAPI, lo que permite inyectar automáticamente la conexión a la base de datos en el endpoint.
+<2> Importa la clase `MySQLConnectionAbstract` para tipar la conexión a la base de datos que se inyectará en el endpoint.
+<3> Importa la función `get_db` para obtener una conexión a la base de datos desde el pool de conexiones.
+<4> Importa los modelos `User` y `UserResponse` para validar los datos de entrada y definir la estructura de la respuesta del endpoint.
+<5> Define un endpoint POST en el router para crear un nuevo usuario. Se especifica que la respuesta del endpoint debe cumplir con el modelo `UserResponse` y que el código de estado HTTP para una creación exitosa es 201 (Created).
+<6> Define la función `create_user` que recibe un objeto `User` con los datos del usuario a crear y una conexión a la base de datos inyectada mediante `Depends(get_db)`.
+<7> Crea un cursor a partir de la conexión a la base de datos para ejecutar la sentencia SQL de inserción.
+<8> Ejecuta la sentencia SQL para insertar un nuevo usuario en la tabla de usuarios, utilizando los datos proporcionados en el objeto `User`.
+<9> Realiza un commit para guardar los cambios en la base de datos después de ejecutar la sentencia SQL.
+<10> Si ocurre una excepción durante la inserción, se realiza un rollback para deshacer cualquier cambio realizado en la base de datos durante la operación.
+<11> Si la excepción es causada por una entrada duplicada (por ejemplo, si el nombre de usuario o el correo electrónico ya existen), se lanza una excepción HTTP con el código de estado 409 (Conflict) y un mensaje de error indicando que el nombre de usuario o el correo electrónico ya existen.
+<12> Registra un mensaje de advertencia indicando que se ha producido un conflicto al intentar crear un usuario con un nombre de usuario o correo electrónico que ya existe. Esto es útil para monitorizar los intentos de creación de usuarios que no cumplen con las restricciones de unicidad en la base de datos.
+<13> Si ocurre cualquier otra excepción inesperada durante la creación del usuario, se registra un mensaje de error con la información de la excepción. Esto es útil para detectar y diagnosticar problemas inesperados durante la operación de creación de usuarios.
+<14> Obtiene el ID generado por la base de datos para el nuevo usuario utilizando `cursor.lastrowid`. Esto permite conocer el ID del usuario recién creado, lo que es útil para devolverlo en la respuesta del endpoint y para futuras operaciones que puedan necesitar el ID del usuario.
+<15> Registra un mensaje de información indicando que se ha creado un nuevo usuario con el ID generado por la base de datos y el nombre de usuario proporcionado. Esto es útil para monitorizar las operaciones de creación de usuarios y confirmar que se han creado correctamente.
+<16> Devuelve un objeto `UserResponse` que incluye el ID generado por la base de datos y los datos del usuario proporcionados en la solicitud. Esto permite al cliente conocer el ID del usuario recién creado y confirmar que la operación se realizó correctamente. Al devolver un objeto `UserResponse con el ID del usuario, se facilita la interacción con la API REST, ya que el cliente puede utilizar este ID para realizar futuras operaciones sobre el usuario, como obtener su información, actualizar sus datos o eliminarlo. Además, incluir el ID en la respuesta es una práctica común en las APIs REST para proporcionar a los clientes una referencia clara al recurso recién creado.
 
 #### Endpoint para obtener todos los usuarios
 
 Añade el siguiente código para definir un endpoint `GET /api/users` que permite obtener todos los usuarios. Este endpoint consulta todos los registros de la tabla de usuarios de MySQL y los devuelve en formato JSON. La operación SQL que se usaría para consultar todos los registros en la tabla de usuarios sería similar a la siguiente:
 
 ```
-SELECT id, username, email, created_at FROM users;
+SELECT  id, 
+        username, 
+        email 
+FROM    users;
 ```
 
 [source,python]
 ----
-# Route to get all users
-@router.get("/", response_model=List[UserResponse])
-async def get_users(db: Session = Depends(get_db)):
-    result = db.execute(text("SELECT id, username, email, created_at FROM users"))
-    users = []
-    for row in result:
-        users.append(UserResponse(id=row[0], username=row[1], email=row[2], created_at=row[3].strftime("%Y-%m-%dT%H:%M:%SZ")))
-    return users
+# Route to list all users
+@router.get("/", response_model=list[UserResponse]) <1>
+def list_users(conn: MySQLConnectionAbstract = Depends(get_db)):
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT id, username, email FROM users")
+    rows = cursor.fetchall() <2>
+    logger.info("GET /users - returned %d users", len(rows)) <3>
+    return cursor.fetchall() <4>
 ----
+<1> Define un endpoint GET en el router para obtener todos los usuarios. Se especifica que la respuesta del endpoint debe ser una lista de objetos `UserResponse`.
+<2> Ejecuta la sentencia SQL para consultar todos los usuarios en la tabla de usuarios y obtiene los resultados utilizando `fetchall()`, que devuelve una lista de registros.
+<3> Registra un mensaje de información indicando que se ha procesado una solicitud para obtener todos los usuarios y cuántos usuarios se han devuelto en la respuesta. Esto es útil para monitorizar las operaciones de consulta de usuarios y confirmar que se han obtenido correctamente.
+<4> Devuelve la lista de usuarios obtenida de la base de datos en formato JSON. Cada usuario se representa como un diccionario con los campos `id`, `username` y `email`, lo que permite al cliente obtener la información de todos los usuarios disponibles en la base de datos.
 
 #### Endpoint para obtener un usuario por ID
 
-Añade el siguiente código para definir un endpoint `GET /api/users/{id}` que permite obtener un usuario por su ID. Este endpoint consulta el registro de la tabla de usuarios de MySQL correspondiente al ID proporcionado en la URL y lo devuelve en formato JSON. Si el usuario existe, se devuelve su información en formato JSON. Si el usuario no existe, se devuelve un mensaje de error. La operación SQL que se usaría para consultar un registro en la tabla de usuarios por su ID sería similar a la siguiente:
+Añade el siguiente código para definir un endpoint `GET /users/{id}` que permite obtener un usuario por su ID. Este endpoint consulta el registro de la tabla de usuarios de MySQL correspondiente al ID proporcionado en la URL y lo devuelve en formato JSON. Si el usuario existe, se devuelve su información en formato JSON. Si el usuario no existe, se devuelve un mensaje de error. La operación SQL que se usaría para consultar un registro en la tabla de usuarios por su ID sería similar a la siguiente:
 
 ```
-SELECT id, username, email, created_at FROM users WHERE id = 1;
+SELECT  id, 
+        username, 
+        email 
+FROM    users 
+WHEREid = 1;
 ```
 
 [source,python]
 ----
-# Route to get a user by ID
-@router.get("/{id}", response_model=UserResponse)
-async def get_user(id: int, db: Session = Depends(get_db)):
-    result = db.execute(text("SELECT id, username, email, created_at FROM users WHERE id = :id"), {"id": id})
-    row = result.fetchone()
-    if not row:
-        raise HTTPException(status_code=404, detail="User not found")
-    return UserResponse(id=row[0], username=row[1], email=row[2], created_at=row[3].strftime("%Y-%m-%dT%H:%M:%SZ"))
+# Route to get a single user by ID
+@router.get("/{user_id}", response_model=UserResponse) <1>
+async def get_user(user_id: int, conn: MySQLConnectionAbstract = Depends(get_db)): <2>
+    cursor = conn.cursor(dictionary=True) <3>
+    cursor.execute("SELECT id, username, email FROM users WHERE id = %s", (user_id,)) <3>
+    row = cursor.fetchone() <4>
+    if row is None:
+        logger.warning("GET /users/%d - not found", user_id) <5>
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found") <6>
+    logger.info("GET /users/%d - found user '%s'", user_id, row["username"])<7>
+    return row <8>
 ----
+<1> Define un endpoint GET en el router para obtener un usuario por su ID. El parámetro `user_id` se obtiene de la URL y se utiliza para consultar el usuario correspondiente en la base de datos. Se especifica que la respuesta del endpoint debe cumplir con el modelo `UserResponse`.
+<2> Define la función `get_user` que recibe el ID del usuario a obtener y una conexión a la base de datos inyectada mediante `Depends(get_db)`.
+<3> Crea un cursor a partir de la conexión a la base de datos para ejecutar la sentencia SQL de consulta. Se utiliza `dictionary=True` para que el resultado se devuelva como un diccionario, lo que facilita el acceso a los campos por nombre.
+<4> Ejecuta la sentencia SQL para consultar el usuario por su ID y obtiene el resultado utilizando `fetchone()`, que devuelve un solo registro o `None` si no se encuentra ningún usuario con el ID proporcionado.
+<5> Si el resultado de la consulta es `None`, significa que no se ha encontrado ningún usuario con el ID proporcionado, por lo que se registra un mensaje de advertencia indicando que no se ha encontrado el usuario. Esto es útil para monitorizar las operaciones de consulta de usuarios por ID y detectar intentos de acceso a usuarios que no existen.
+<6> Lanza una excepción HTTP con el código de estado 404 (Not Found) y un mensaje de error indicando que el usuario no se encontró. Esto permite al cliente recibir una respuesta clara y adecuada cuando intenta acceder a un usuario que no existe en la base de datos.
+<7> Registra un mensaje de información indicando que se ha encontrado un usuario con el ID proporcionado y muestra su nombre de usuario. Esto es útil para monitorizar las operaciones de consulta de usuarios por ID y confirmar que se han encontrado correctamente.
+<8> Devuelve el diccionario con la información del usuario obtenido de la base de datos en formato JSON. El diccionario incluye los campos `id`, `username` y `email`, lo que permite al cliente obtener la información del usuario solicitado.
 
 #### Endpoint para actualizar un usuario
 
-Añade el siguiente código para definir un endpoint `PUT /api/users/{id}` que permite actualizar un usuario por su ID. Este endpoint recibe el ID del usuario como parámetro en la URL y los nuevos datos del usuario en formato JSON en el cuerpo de la solicitud. Los datos del usuario a actualizar deben incluir los campos: `username` y `email`. El endpoint busca el usuario por su ID. El endpoint actualiza el usuario correspondiente en la tabla de usuarios de MySQL. Si el usuario se actualiza correctamente, se devuelve un mensaje de éxito. Si el usuario no existe, se devuelve un mensaje de error. La operación SQL que se usaría para actualizar un usuario en la tabla de usuarios sería similar a la siguiente:
+Añade el siguiente código para definir un endpoint `PUT /users/{id}` que permite actualizar un usuario por su ID. Este endpoint recibe el ID del usuario como parámetro en la URL y los nuevos datos del usuario en formato JSON en el cuerpo de la solicitud. Los datos del usuario a actualizar deben incluir los campos: `username` y `email`. El endpoint busca el usuario por su ID. El endpoint actualiza el usuario correspondiente en la tabla de usuarios de MySQL. Si el usuario se actualiza correctamente, se devuelve un mensaje de éxito. Si el usuario no existe, se devuelve un mensaje de error. La operación SQL que se usaría para actualizar un usuario en la tabla de usuarios sería similar a la siguiente:
 
 ```
-UPDATE users SET username = 'nuevo_usuario', email = 'nuevo_email@example.com' WHERE id = 1;
+UPDATE  users 
+SET     username = 'nuevo_usuario', 
+        email = 'nuevo_email@example.com' 
+WHERE   id = 1;
 ```
 
 [source,python]
 ----
-# Route to update a user by ID
-@router.put("/{id}", response_model=UserResponse)
-async def update_user(id: int, user: UserRequest, db: Session = Depends(get_db)):
+# Route to update an existing user by ID
+@router.put("/{user_id}", response_model=UserResponse) <1>
+async def update_user(user_id: int, user: User, conn: MySQLConnectionAbstract = Depends(get_db)): <2>
+    cursor = conn.cursor(dictionary=True) <3>
+    cursor.execute("SELECT id FROM users WHERE id = %s", (user_id,))<4>
+    if cursor.fetchone() is None: <5>
+        logger.warning("PUT /users/%d - not found", user_id) <6>
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found") <7>
     try:
-        db.execute(text("UPDATE users SET username = :username, email = :email WHERE id = :id"), {"username": user.username, "email": user.email, "id": id})
-        db.commit()
-        result = db.execute(text("SELECT id, username, email, created_at FROM users WHERE id = :id"), {"id": id})
-        row = result.fetchone()
-        if not row:
-            raise HTTPException(status_code=404, detail="User not found")
-        return UserResponse(id=row[0], username=row[1], email=row[2], created_at=row[3].strftime("%Y-%m-%dT%H:%M:%SZ"))
+        cursor.execute( <8>
+            "UPDATE users SET username = %s, email = %s WHERE id = %s",
+            (user.username, user.email, user_id),
+        )
+        conn.commit() <9>
     except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        conn.rollback() <10>
+        if "Duplicate entry" in str(e):<11>
+            logger.warning("PUT /users/%d - conflict: username or email already exists", user_id) <12>
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username or email already exists") <13>
+        raise
+    logger.info("PUT /users/%d - updated successfully", user_id) <14>
+    return UserResponse(id=user_id, **user.model_dump()) <15>
 ----
+<1> Define un endpoint PUT en el router para actualizar un usuario por su ID. El parámetro `user_id` se obtiene de la URL y se utiliza para identificar el usuario a actualizar. Se especifica que la respuesta del endpoint debe cumplir con el modelo `UserResponse`.
+<2> Define la función `update_user` que recibe el ID del usuario a actualizar, un objeto `User` con los nuevos datos del usuario y una conexión a la base de datos inyectada mediante `Depends(get_db)`.
+<3> Crea un cursor a partir de la conexión a la base de datos para ejecutar las sentencias SQL.
+<4> Ejecuta una sentencia SQL para verificar si el usuario con el ID proporcionado existe en la base de datos.
+<5> Si el resultado de la consulta es `None`, significa que el usuario no existe, por lo que se lanza una excepción HTTP con el código de estado 404 (Not Found) y un mensaje de error indicando que el usuario no se encontró.
+<6> Si el usuario no existe, se registra un mensaje de advertencia indicando que no se ha encontrado el usuario. Esto es útil para monitorizar las operaciones de actualización de usuarios por ID y detectar intentos de actualización de usuarios que no existen.
+<7> Disparar una excepción HTTP con el código de estado 404 (Not Found) y un mensaje de error indicando que el usuario no se encontró. Esto permite al cliente recibir una respuesta clara y adecuada cuando intenta actualizar un usuario que no existe en la base de datos.
+<8> Ejecuta la sentencia SQL para actualizar el usuario con los nuevos datos proporcionados en el objeto `User`.
+<9> Realiza un commit para guardar los cambios en la base de datos después de ejecutar la sentencia SQL.
+<10> Si ocurre una excepción durante la actualización, se realiza un rollback para deshacer cualquier cambio realizado en la base de datos durante la operación.
+<11> Si la excepción es causada por una entrada duplicada (por ejemplo, si el nuevo nombre de usuario o el nuevo correo electrónico ya existen), se lanza una excepción HTTP con el código de estado 409 (Conflict) y un mensaje de error indicando que el nombre de usuario o el correo electrónico ya existen.
+<12> Registra un mensaje de advertencia indicando que se ha producido un conflicto al intentar actualizar un usuario con un nombre de usuario o correo electrónico que ya existe. Esto es útil para monitorizar los intentos de actualización de usuarios que no cumplen con las restricciones de unicidad en la base de datos.
+<13> Disparar una excepción HTTP con el código de estado 409 (Conflict) y un mensaje de error indicando que el nombre de usuario o el correo electrónico ya existen. Esto permite al cliente recibir una respuesta clara y adecuada cuando intenta actualizar un usuario con datos que violan las restricciones de unicidad en la base de datos.
+<14> Registra un mensaje de información indicando que se ha actualizado correctamente el usuario con el ID proporcionado. Esto es útil para monitorizar las operaciones de actualización de usuarios por ID y confirmar que se han actualizado correctamente.
+<15> Devuelve un objeto `UserResponse` que incluye el ID del usuario actualizado y los nuevos datos del usuario proporcionados en la solicitud. Esto permite al cliente confirmar que la operación de actualización se realizó correctamente y obtener los detalles del usuario actualizado. Al devolver un objeto `UserResponse` con el ID del usuario, se facilita la interacción con la API REST, ya que el cliente puede utilizar este ID para realizar futuras operaciones sobre el usuario, como obtener su información, actualizar sus datos nuevamente o eliminarlo. Además, incluir el ID en la respuesta es una práctica común en las APIs REST para proporcionar a los clientes una referencia clara al recurso actualizado.
 
 #### Endpoint para eliminar un usuario
 
-Añade el siguiente código para definir un endpoint `DELETE /api/users/{id}` que permite eliminar un usuario por su ID. Este endpoint recibe el ID del usuario como parámetro en la URL. El endpoint busca el usuario por su ID y lo elimina de la tabla de usuarios de MySQL. Si el usuario se elimina correctamente, se devuelve un mensaje de éxito. Si el usuario no existe, se devuelve un mensaje de error. La operación SQL que se usaría para eliminar un usuario en la tabla de usuarios sería similar a la siguiente:
+Añade el siguiente código para definir un endpoint `DELETE /users/{id}` que permite eliminar un usuario por su ID. Este endpoint recibe el ID del usuario como parámetro en la URL. El endpoint busca el usuario por su ID y lo elimina de la tabla de usuarios de MySQL. Si el usuario se elimina correctamente, se devuelve un mensaje de éxito. Si el usuario no existe, se devuelve un mensaje de error. La operación SQL que se usaría para eliminar un usuario en la tabla de usuarios sería similar a la siguiente:
 
 ```
-DELETE FROM users WHERE id = 1;
+DELETE 
+FROM    users 
+WHERE   id = 1;
 ```
 
 [source,python]
 ----
 # Route to delete a user by ID
-@router.delete("/{id}")
-async def delete_user(id: int, db: Session = Depends(get_db)):
-    try:
-        result = db.execute(text("DELETE FROM users WHERE id = :id"), {"id": id})
-        if result.rowcount == 0:
-            raise HTTPException(status_code=404, detail="User not found")
-        db.commit()
-        return {"message": "User deleted"}
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT) <1>
+async def delete_user(user_id: int, conn: MySQLConnectionAbstract = Depends(get_db)): <2>
+    cursor = conn.cursor() <3>
+    cursor.execute("SELECT id FROM users WHERE id = %s", (user_id,)) <4>
+    if cursor.fetchone() is None: <5>
+        logger.warning("DELETE /users/%d - not found", user_id) <6>
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found") <7>
+    cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))<8>
+    conn.commit() <9>
+    logger.info("DELETE /users/%d - deleted successfully", user_id) <10>
 ----
+<1> Define un endpoint DELETE en el router para eliminar un usuario por su ID. El parámetro `user_id` se obtiene de la URL y se utiliza para identificar el usuario a eliminar. Se especifica que el código de estado HTTP para una eliminación exitosa es 204 (No Content), lo que indica que la operación se realizó correctamente pero no se devuelve contenido en la respuesta.
+<2> Define la función `delete_user` que recibe el ID del usuario a eliminar y una conexión a la base de datos inyectada mediante `Depends(get_db)`.
+<3> Crea un cursor a partir de la conexión a la base de datos para ejecutar las sentencias SQL.
+<4> Ejecuta una sentencia SQL para verificar si el usuario con el ID proporcionado existe en la base de datos.
+<5> Si el resultado de la consulta es `None`, significa que el usuario no existe, por lo que se lanza una excepción HTTP con el código de estado 404 (Not Found) y un mensaje de error indicando que el usuario no se encontró.
+<6> Si el usuario no existe, se registra un mensaje de advertencia indicando que no se ha encontrado el usuario. Esto es útil para monitorizar las operaciones de eliminación de usuarios por ID y detectar intentos de eliminación de usuarios que no existen.
+<7> Disparar una excepción HTTP con el código de estado 404 (Not Found) y un mensaje de error indicando que el usuario no se encontró. Esto permite al cliente recibir una respuesta clara y adecuada cuando intenta eliminar un usuario que no existe en la base de datos.
+<8> Ejecuta la sentencia SQL para eliminar el usuario con el ID proporcionado.
+<9> Realiza un commit para guardar los cambios en la base de datos después de ejecutar la sentencia SQL. Esto asegura que el usuario se elimine correctamente de la base de datos. Si la eliminación es exitosa, el endpoint devolverá un código de estado 204 (No Content) sin contenido en la respuesta, lo que indica que la operación se realizó correctamente.
+<10> Registra un mensaje de información indicando que se ha eliminado correctamente el usuario con el ID proporcionado. Esto es útil para monitorizar las operaciones de eliminación de usuarios por ID y confirmar que se han eliminado correctamente.
 
-### Endpoints de categorías
+### Resto de endpoints
 
-En esta sección vamos a implementar los endpoints para gestionar categorías en la API REST. Los endpoints incluyen la creación, consulta, actualización y eliminación de categorías.
+Los endpoints para productos, categorías y valoraciones se implementarán de manera similar a los endpoints de usuarios, siguiendo la misma estructura y lógica para manejar las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) en cada recurso. Se crearán archivos de router específicos para cada recurso (por ejemplo, `routers/products.py`, `routers/categories.py`, `routers/reviews.py`) y se añadirán al enrutado principal en `main.py` con los prefijos y etiquetas correspondientes. Cada endpoint se encargará de validar los datos de entrada utilizando los modelos Pydantic definidos en `models.py`, ejecutar las operaciones SQL necesarias para interactuar con la base de datos MySQL y devolver las respuestas adecuadas según el resultado de cada operación.
 
-[NOTE]
-====
-De aquí en adelante, los endpoints se implementarán utilizando SQLAlchemy para interactuar con MySQL. SQLAlchemy es un ORM (Object-Relational Mapping) que facilita la interacción con bases de datos relacionales mediante el uso de objetos y clases en lugar de escribir consultas SQL directamente. Esto permite una mayor abstracción y facilita el desarrollo de la API REST. Con SQLAlchemy, se pueden definir modelos de datos como clases de Python y utilizar métodos y funciones (como `add`, `query`, `filter`, `update`, `delete`, etc.) para realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) en la base de datos.
-====
+### Incorporación de funcionalidades adicionales
 
-En el archivo `routes/categories.py` añade el siguiente código antes de la definición de las rutas de categorías:
+Además de los endpoints básicos para gestionar usuarios, productos, categorías y valoraciones, se pueden incorporar funcionalidades adicionales para mejorar la experiencia del usuario y la eficiencia de la API REST. Algunas de estas funcionalidades podrían incluir:
+
+* Búsqueda y filtrado avanzado en los endpoints de productos, categorías y comentarios.
+* Paginación en los endpoints de listado para manejar grandes volúmenes de datos.
+
+#### Búsqueda y filtrado avanzado
+
+Para mejorar la experiencia del usuario, se pueden implementar funcionalidades de búsqueda y filtrado avanzado en los endpoints de productos, categorías y comentarios. Esto permitiría a los usuarios buscar productos por nombre, filtrar productos por categoría, y filtrar comentarios por producto o usuario. Para implementar estas funcionalidades, se pueden añadir parámetros de consulta (_query parameters_) a los endpoints correspondientes y modificar las consultas SQL para incluir cláusulas `WHERE` que permitan realizar el filtrado según los criterios especificados por el usuario.
+
+**Búsqueda de productos por nombre y filtrado por categoría**
+
+En el endpoint `GET /products`, se pueden añadir parámetros de consulta `name` y `categoryId` para permitir a los usuarios buscar productos por nombre y filtrar productos por categoría. La consulta SQL se modificaría para incluir cláusulas `WHERE` que filtren los productos según el nombre y la categoría especificados.
+
+La técnica que utilizaremos para implememtar la búsqueda en el endpoint será capturar los parámetros opcionales de búsqueda y filtrado, preparemos una claúsula `WHERE` que no se vea afectada por la ausencia de los parámetros, y luego añadiremos condiciones adicionales a la consulta SQL según los parámetros que se hayan proporcionado. Esto nos permitirá realizar búsquedas y filtrados flexibles sin afectar la estructura general del endpoint.
+
+.Archivo `./api/routers/products.py`
+[source,python]
+----
+# Route to list all products, with optional filtering by name and categoryId
+@router.get("/", response_model=list[ProductResponse]) <1>
+async def list_products(
+    name: Optional[str] = Query(default=None, description="Filter by product name (partial match)"), <2>
+    categoryId: Optional[int] = Query(default=None, description="Filter by category ID"), <3>
+    conn: MySQLConnectionAbstract = Depends(get_db),
+):
+    logger.info("GET /products - name=%r categoryId=%r", name, categoryId)
+    query = "SELECT id, name, description, price, categoryId FROM products WHERE 1=1" <4>
+    params: list = [] <5>
+    if name is not None: <6>
+        query += " AND name LIKE %s" <7>
+        params.append(f"%{name}%") <8>
+    if categoryId is not None: <9>
+        query += " AND categoryId = %s"
+        params.append(categoryId)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(query, params) <10>
+    rows = cursor.fetchall()
+    logger.info("GET /products - returned %d products", len(rows))
+    return rows
+----
+<1> La definición del endopoint no se ve afectada por la adición de los parámetros de consulta, ya que estos son opcionales y no forman parte de la ruta del endpoint. El endpoint sigue siendo `GET /products`, pero ahora puede aceptar parámetros de consulta adicionales para realizar filtrado.
+<2> Se añade un parámetro de consulta `name` que permite a los usuarios filtrar productos por nombre. Este parámetro es opcional y se utiliza para realizar una búsqueda de coincidencia parcial en el nombre del producto utilizando la cláusula `LIKE` en la consulta SQL.
+<3> Se añade un parámetro de consulta `categoryId` que permite a los usuarios filtrar productos por categoría. Este parámetro es opcional y se utiliza para filtrar los productos que pertenecen a una categoría específica utilizando la cláusula `WHERE` en la consulta SQL.
+<4> Se construye la consulta SQL base para seleccionar los productos de la tabla `products`. La cláusula `WHERE 1=1` se utiliza como una forma de facilitar la construcción dinámica de la consulta, permitiendo añadir condiciones adicionales de filtrado sin preocuparse por la sintaxis de la cláusula `WHERE`.
+<5> Se inicializa una lista `params` para almacenar los parámetros que se utilizarán en la consulta SQL. Esta lista se llenará con los valores de los parámetros de consulta que se proporcionen, y se pasará al método `execute` para evitar problemas de inyección SQL.
+<6> Si el parámetro `name` se proporciona en la consulta, se añade una condición a la consulta SQL para filtrar los productos cuyo nombre contenga el valor proporcionado. Se utiliza la cláusula `LIKE` con comodines `%` para permitir una búsqueda de coincidencia parcial en el nombre del producto.
+<7> `%s` se utiliza como marcador de posición en la consulta SQL para el valor del nombre del producto, lo que permite pasar el valor de manera segura a través de los parámetros de consulta y evitar problemas de inyección SQL.
+<8> Se añade el valor del parámetro `name` a la lista de parámetros, formateado con comodines `%` para permitir una búsqueda de coincidencia parcial en el nombre del producto.
+<9> Si el parámetro `categoryId` se proporciona en la consulta, se añade una condición a la consulta SQL para filtrar los productos que pertenecen a la categoría especificada por el ID. Esto permite a los usuarios obtener solo los productos que pertenecen a una categoría específica.
+<10> Se ejecuta la consulta SQL con los parámetros de filtrado utilizando el método `execute`, pasando la consulta construida y la lista de parámetros. Esto permite obtener los productos que cumplen con los criterios de filtrado especificados por el usuario en los parámetros de consulta.
+
+**Búsqueda de comentarios por producto y usuario**
+
+Análogamente a lo que se ha hecho para el endpoint de productos, se pueden añadir parámetros de consulta `productId` y `userId` al endpoint `GET /reviews` para permitir a los usuarios filtrar comentarios por producto y por usuario. La consulta SQL se modificaría para incluir cláusulas `WHERE` que filtren los comentarios según el producto y el usuario especificados. Esto permitiría a los usuarios obtener solo los comentarios relacionados con un producto específico o realizados por un usuario específico, mejorando la experiencia de búsqueda y filtrado en la API REST.
 
 [source,python]
 ----
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.orm import Session
-from typing import List
-from models import Category, CategoryResponse, CategoryDB
-from database import get_db
-
-router = APIRouter()
-
-// Los endpoints de categorías se definen aquí
+# Route to list all reviews, with optional filtering by productId and userId
+@router.get("/", response_model=list[ReviewResponse]) <1>
+async def list_reviews(
+    productId: Optional[int] = Query(default=None, description="Filter reviews by product ID"), <2>
+    userId: Optional[int] = Query(default=None, description="Filter reviews by user ID"), <3>
+    conn: MySQLConnectionAbstract = Depends(get_db),
+):
+    logger.info("GET /reviews - productId=%r userId=%r", productId, userId)
+    query = "SELECT id, productId, userId, rating, comment FROM reviews WHERE 1=1" <4>
+    params: list = [] <5>
+    if productId is not None: <6>
+        query += " AND productId = %s" <7>
+        params.append(productId) <8>
+    if userId is not None: <9>
+        query += " AND userId = %s"
+        params.append(userId)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(query, params) <10>
+    rows = cursor.fetchall()
+    logger.info("GET /reviews - returned %d reviews", len(rows))
+    return rows
 ----
+<1> La definición del endpoint no se ve afectada por la adición de los parámetros de consulta, ya que estos son opcionales y no forman parte de la ruta del endpoint. El endpoint sigue siendo `GET /reviews`, pero ahora puede aceptar parámetros de consulta adicionales para realizar filtrado.
+<2> Se añade un parámetro de consulta `productId` que permite a los usuarios filtrar comentarios por el ID del producto al que están asociados. Este parámetro es opcional y se utiliza para filtrar los comentarios que pertenecen a un producto específico utilizando la cláusula `WHERE` en la consulta SQL.
+<3> Se añade un parámetro de consulta `userId` que permite a los usuarios filtrar comentarios por el ID del usuario que los realizó. Este parámetro es opcional y se utiliza para filtrar los comentarios que fueron realizados por un usuario específico utilizando la cláusula `WHERE` en la consulta SQL.
+<4> Se construye la consulta SQL base para seleccionar los comentarios de la tabla `reviews`. La cláusula `WHERE 1=1` se utiliza como una forma de facilitar la construcción dinámica de la consulta, permitiendo añadir condiciones adicionales de filtrado sin preocuparse por la sintaxis de la cláusula `WHERE`.
+<5> Se inicializa una lista `params` para almacenar los parámetros que se utilizarán en la consulta SQL. Esta lista se llenará con los valores de los parámetros de consulta que se proporcionen, y se pasará al método `execute` para evitar problemas de inyección SQL.
+<6> Si el parámetro `productId` se proporciona en la consulta, se añade una condición a la consulta SQL para filtrar los comentarios que pertenecen al producto especificado por el ID. Esto permite a los usuarios obtener solo los comentarios relacionados con un producto específico.
+<7> `%s` se utiliza como marcador de posición en la consulta SQL para el valor del ID del producto, lo que permite pasar el valor de manera segura a través de los parámetros de consulta y evitar problemas de inyección SQL.
+<8> Se añade el valor del parámetro `productId` a la lista de parámetros para que se utilice en la consulta SQL.
+<9> Se añade el valor del parámetro `userId` a la lista de parámetros para que se utilice en la consulta SQL.
+<10> Se ejecuta la consulta SQL con los parámetros de filtrado utilizando el método `execute`, pasando la consulta construida y la lista de parámetros. Esto permite obtener los comentarios que cumplen con los criterios de filtrado especificados por el usuario en los parámetros de consulta.
 
-#### Añadir el enrutado de categorías a `main.py`
+**Paginación en los endpoints de listado**
 
-Modificar el archivo `main.py` para incluir el enrutado de categorías en la aplicación FastAPI. Se harán modificaciones para importar el router de categorías y añadirlo a la aplicación con el prefijo `/api/categories` y la etiqueta `categories`.
-[source,python]
-----
-from fastapi import FastAPI
-from routes import test, users, categories # Importar el router de categorías
-from database import engine, Base
-from sqlalchemy import text
+Es importante implementar paginación en los endpoints de listado para manejar grandes volúmenes de datos de manera eficiente. La paginación permite a los clientes obtener los resultados en partes más pequeñas, lo que reduce la carga en el servidor y mejora la experiencia del usuario al evitar tiempos de espera prolongados. Para implementar la paginación, se pueden añadir parámetros de consulta `page` y `pageSize` a los endpoints de listado, y modificar las consultas SQL para incluir cláusulas `LIMIT` y `OFFSET` que permitan obtener solo un subconjunto de los resultados según la página solicitada. Esto permitirá a los usuarios navegar por los resultados de manera más eficiente y evitar problemas de rendimiento al manejar grandes conjuntos de datos.
 
-# Crear tablas si no existen. Al usar SQLAlchemy, se crean todas las tablas definidas en los modelos que heredan de Base
-Base.metadata.create_all(bind=engine)
-
-# Crear tabla users si no existe
-with engine.connect() as conn:
-    conn.execute(text("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) NOT NULL UNIQUE,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    """))
-    conn.commit()
-
-app = FastAPI(
-    title="Products and Reviews API",
-    description="API for managing products and reviews using FastAPI and MySQL",
-    version="1.0.0"
-)
-
-app.include_router(test.router, prefix="/api/test", tags=["test"])
-app.include_router(users.router, prefix="/api/users", tags=["users"])
-app.include_router(categories.router, prefix="/api/categories", tags=["categories"])
-----
-
-#### Endpoint para crear una categoría
-
-Añade el siguiente código para definir un endpoint `POST /api/categories` que permite crear una nueva categoría. Este endpoint recibe los datos de la categoría en formato JSON en el cuerpo de la solicitud y los inserta en la tabla de categorías de MySQL. En el cuerpo de la solicitud se deben proporcionar los siguientes campos: `name`, `description` y `parentId`. El endpoint devuelve un mensaje con el ID de la nueva categoría creada. 
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se crea una instancia del modelo `CategoryDB` con los datos proporcionados y se añade a la sesión de la base de datos. Luego, se confirma la transacción para guardar los cambios en la base de datos.
-====
+Ilustremos cómo se podría implementar la paginación en el endpoint `GET /products` añadiendo los parámetros de consulta `page` y `pageSize`, y modificando la consulta SQL para incluir las cláusulas `LIMIT` y `OFFSET`.
 
 [source,python]
 ----
-# Route to create a new category
-@router.post("/", response_model=CategoryResponse, status_code=201)
-async def create_category(category: Category, db: Session = Depends(get_db)):
-    category_db = CategoryDB(**category.dict())
-    db.add(category_db)
-    db.commit()
-    db.refresh(category_db)
-    return CategoryResponse(id=category_db.id, **category.dict())
+...
+DEFAULT_PAGE_SIZE = 10 <1>
+MAX_PAGE_SIZE = 100 <2>
+
+
+# Route to list all products, with optional filtering by name and categoryId, and pagination
+@router.get("/", response_model=list[ProductResponse])
+async def list_products(
+    name: Optional[str] = Query(default=None, description="Filter by product name (partial match)"),
+    categoryId: Optional[int] = Query(default=None, description="Filter by category ID"),
+    page: int = Query(default=1, ge=1, description="Page number (1-based)"), <3>
+    pageSize: int = Query(default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE, description="Number of results per page"), <4>
+    conn: MySQLConnectionAbstract = Depends(get_db),
+):
+    logger.info("GET /products - name=%r categoryId=%r page=%d pageSize=%d", name, categoryId, page, pageSize)
+    query = "SELECT id, name, description, price, categoryId FROM products WHERE 1=1"
+    params: list = []
+    if name is not None:
+        query += " AND name LIKE %s"
+        params.append(f"%{name}%")
+    if categoryId is not None:
+        query += " AND categoryId = %s"
+        params.append(categoryId)
+    query += " LIMIT %s OFFSET %s" <5>
+    params.extend([pageSize, (page - 1) * pageSize]) <6>
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    logger.info("GET /products - returned %d products (page %d, pageSize %d)", len(rows), page, pageSize)
+    return rows
+----
+<1> Define una constante `DEFAULT_PAGE_SIZE` que establece el número predeterminado de resultados por página para la paginación. Esto proporciona un valor por defecto para el parámetro `pageSize` en caso de que el cliente no lo especifique en la consulta.
+<2> Define una constante `MAX_PAGE_SIZE` que establece el número máximo de resultados por página para la paginación. Esto ayuda a prevenir que los clientes soliciten un número excesivo de resultados en una sola página, lo que podría afectar el rendimiento del servidor.
+<3> Se añade un parámetro de consulta `page` que permite a los usuarios especificar el número de página que desean obtener. Este parámetro es opcional y tiene un valor predeterminado de 1, lo que significa que si el cliente no especifica un número de página, se devolverá la primera página de resultados. El parámetro `page` también tiene una restricción de valor mínimo de 1 para garantizar que se soliciten páginas válidas.
+<4> Se añade un parámetro de consulta `pageSize` que permite a los usuarios especificar el número de resultados por página que desean obtener. Este parámetro es opcional y tiene un valor predeterminado definido por `DEFAULT_PAGE_SIZE`. El parámetro `pageSize` también tiene restricciones de valor mínimo y máximo para garantizar que se soliciten cantidades válidas de resultados por página.
+<5> Se modifica la consulta SQL para incluir las cláusulas `LIMIT` y `OFFSET`, que permiten obtener solo un subconjunto de los resultados según la página solicitada. `LIMIT` se utiliza para especificar el número máximo de resultados a devolver, mientras que `OFFSET` se utiliza para especificar el número de resultados a omitir antes de comenzar a devolver resultados. Esto permite implementar la paginación de manera eficiente en la consulta SQL.
+<6> Se añaden los valores de `pageSize` y el cálculo de `OFFSET` a la lista de parámetros para que se utilicen en la consulta SQL. El cálculo de `OFFSET` se realiza restando 1 al número de página y multiplicándolo por el tamaño de página para determinar cuántos resultados se deben omitir antes de comenzar a devolver resultados. Esto permite a los usuarios navegar por los resultados de manera eficiente utilizando la paginación, evitando tiempos de espera prolongados al manejar grandes conjuntos de datos.
+
+### Actualización de HATEOAS
+
+Tras implementar el resto de endpoints de la API, actualizamos la implementación de HATEOAS para incluir enlaces a los nuevos endpoints de productos, categorías y valoraciones. Esto permitirá a los clientes descubrir fácilmente las operaciones disponibles en la API REST y navegar por los recursos relacionados de manera intuitiva. Nos limitaremos a poder acceder a los usuarios, catetorías, productos y valoraciones desde el endpoint raíz.
+
+[source, python]
+----
+# Define the root endpoint with HATEOAS links
+@router.get("/")
+async def root(request: Request):
+    base = str(request.base_url).rstrip("/")
+
+    return {
+        "message": "Welcome to Products API",
+        "_links": {
+            "self": f"{base}/",
+            "health": f"{base}/health",
+            "docs": f"{base}/docs",
+            "redoc": f"{base}/redoc",
+            "openapi": f"{base}/openapi.json",
+            "users": f"{base}/users",
+            "categories": f"{base}/categories",
+            "products": f"{base}/products",
+            "reviews": f"{base}/reviews",
+        },
+    }
 ----
 
-#### Endpoint para obtener todas las categorías
-
-Añade el siguiente código para definir un endpoint `GET /api/categories` que permite obtener todas las categorías. Este endpoint consulta todas las categorías de la tabla de categorías de MySQL y las devuelve en formato JSON. 
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de categorías usando el ORM y se devuelve la lista de categorías.
-====
-
-[source,python]
-----
-# Route to get all categories
-@router.get("/", response_model=List[CategoryResponse])
-async def get_categories(db: Session = Depends(get_db)):
-    categories = db.query(CategoryDB).all()
-    return [CategoryResponse(id=c.id, name=c.name, description=c.description, parentId=c.parentId) for c in categories]
-----
-
-#### Endpoint para obtener una categoría por ID
-
-Añade el siguiente código para definir un endpoint `GET /api/categories/{id}` que permite obtener una categoría por su ID. Este endpoint recibe el ID de la categoría como parámetro en la URL y busca la categoría correspondiente en la tabla de categorías de MySQL. Si la categoría existe, se devuelve su información en formato JSON. Si la categoría no existe, se devuelve un mensaje de error. 
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de categorías usando el ORM y se devuelve la categoría.
-====
-
-[source,python]
-----
-# Route to get a category by ID
-@router.put("/{id}", response_model=CategoryResponse)
-async def update_category(id: int, category: Category, db: Session = Depends(get_db)):
-    category_db = db.query(CategoryDB).filter(CategoryDB.id == id).first()
-    if not category_db:
-        raise HTTPException(status_code=404, detail="Category not found")
-    for key, value in category.dict().items():
-        setattr(category_db, key, value)
-    db.commit()
-    db.refresh(category_db)
-    return CategoryResponse(id=category_db.id, **category.dict())
-----
-
-#### Endpoint para actualizar una categoría
-
-Añade el siguiente código para definir un endpoint `PUT /api/categories/{id}` que permite actualizar una categoría por su ID. Este endpoint recibe el ID de la categoría como parámetro en la URL y los nuevos datos de la categoría en formato JSON en el cuerpo de la solicitud. Los datos de la categoría a actualizar deben incluir los campos `name`, `description` y `parentId`. El endpoint actualiza la categoría correspondiente en la tabla de categorías de MySQL. Si la categoría se actualiza correctamente, se devuelve un mensaje de éxito. Si la categoría no se encuentra, se devuelve un mensaje de error. 
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de categorías usando el ORM, se actualizan los campos y se confirma la transacción para guardar los cambios en la base de datos.
-====
-
-[source,python]
-----
-# Route to update a category by ID
-@router.put("/{id}", response_model=CategoryResponse)
-async def update_category(id: str, category: Category):
-    try:
-        result = categories_collection.update_one(
-            {"_id": ObjectId(id)},
-            {"$set": category.dict()}
-        )
-        if result.matched_count == 0:
-            raise HTTPException(status_code=404, detail="Category not found")
-        updated_category = categories_collection.find_one({"_id": ObjectId(id)})
-        updated_category["id"] = str(updated_category["_id"])
-        del updated_category["_id"]
-        return updated_category
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid category ID")
-----
-
-#### Endpoint para eliminar una categoría
-
-Añade el siguiente código para definir un endpoint `DELETE /api/categories/{id}` que permite eliminar una categoría por su ID. Este endpoint recibe el ID de la categoría como parámetro en la URL y elimina la categoría correspondiente de la tabla de categorías de MySQL. Si la categoría se elimina correctamente, se devuelve un mensaje de éxito. Si la categoría no se encuentra, se devuelve un mensaje de error. 
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de categorías usando el ORM y se elimina la categoría.
-====
-
-[source,python]
-----
-# Route to delete a category by ID
-@router.delete("/{id}", status_code=200)
-async def delete_category(id: int, db: Session = Depends(get_db)):
-    category = db.query(CategoryDB).filter(CategoryDB.id == id).first()
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-    db.delete(category)
-    db.commit()
-    return {"message": "Category deleted"}
-----
-
-### Endpoints de productos
-
-En esta sección vamos a implementar los endpoints para gestionar productos en la API REST. Los endpoints incluyen la creación, consulta, actualización y eliminación de productos.
-
-En el archivo `routes/products.py` añade el siguiente código antes de la definición de las rutas de productos:
-
-[source,python]
-----
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.orm import Session
-from typing import Optional, List
-from models import Product, ProductResponse, ProductDB
-from database import get_db
-
-router = APIRouter()
-
-// Los endpoints de productos se definen aquí
-----
-
-#### Añadir el enrutado de productos a `main.py`
-
-Modificar el archivo `main.py` para incluir el enrutado de productos en la aplicación FastAPI. Se harán modificaciones para importar el router de productos y añadirlo a la aplicación con el prefijo `/api/products` y la etiqueta `products`.
-
-[source,python]
-----
-from fastapi import FastAPI
-from routes import test, users, categories, products # Importar el router de productos
-from database import engine, Base
-from sqlalchemy import text
-
-# Crear tablas si no existen. Al usar SQLAlchemy, se crean todas las tablas definidas en los modelos que heredan de Base
-Base.metadata.create_all(bind=engine)
-
-# Crear tabla users si no existe
-with engine.connect() as conn:
-    conn.execute(text("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) NOT NULL UNIQUE,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    """))
-    conn.commit()
-
-app = FastAPI(
-    title="Products and Reviews API",
-    description="API for managing products and reviews using FastAPI and MySQL",
-    version="1.0.0"
-)
-
-app.include_router(test.router, prefix="/api/test", tags=["test"])
-app.include_router(users.router, prefix="/api/users", tags=["users"])
-app.include_router(categories.router, prefix="/api/categories", tags=["categories"])
-app.include_router(products.router, prefix="/api/products", tags=["products"])  # Añadir el router de productos
-----
-
-#### Endpoint para crear un producto
-
-Añade el siguiente código para definir un endpoint `POST /api/products` que permite crear un nuevo producto. Este endpoint recibe los datos del producto en formato JSON en el cuerpo de la solicitud y los inserta en la tabla de productos de MySQL. En el cuerpo de la solicitudo se deben proporcionar los siguientes campos: `name`, `description`, `price` y `categoryId`. El endpoint devuelve un mensaje con el ID del nuevo producto creado. 
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se crea una instancia del modelo `ProductDB` con los datos proporcionados y se añade a la sesión de la base de datos. Luego, se confirma la transacción para guardar los cambios en la base de datos.
-====
-
-[source,python]
-----
-# Route to create a new product
-@router.post("/", response_model=ProductResponse, status_code=201)
-async def create_product(product: Product, db: Session = Depends(get_db)):
-    product_db = ProductDB(**product.dict())
-    db.add(product_db)
-    db.commit()
-    db.refresh(product_db)
-    return ProductResponse(**product.dict(), id=product_db.id)
-----
-
-#### Endpoint para obtener detalles de un producto
-
-Añade el siguiente código para definir un endpoint `GET /api/products/{id}` que permite obtener los detalles de un producto por su ID. Este endpoint recibe el ID del producto como parámetro en la URL y busca el producto correspondiente en la tabla de productos de MySQL. Si el producto existe, se devuelve su información en formato JSON. Si el producto no existe, se devuelve un mensaje de error. 
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de productos usando el ORM y se devuelve el producto.
-====
-
-[source,python]
-----
-# Route to get a product by ID
-@router.get("/{id}", response_model=ProductResponse)
-async def get_product(id: int, db: Session = Depends(get_db)):
-    product = db.query(ProductDB).filter(ProductDB.id == id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return ProductResponse(id=product.id, name=product.name, description=product.description, price=product.price, categoryId=product.categoryId)
-----
-
-#### Endpoint para consultar productos
-
-Añade el siguiente código para definir un endpoint `GET /api/products` que permite consultar productos. Este endpoint admite parámetros de consulta opcionales para filtrar los productos por categoría (`categoryId`) o por nombre (`name`). Si se proporciona el parámetro `categoryId`, se filtran los productos por la categoría especificada. Si se proporciona el parámetro `name`, se filtran los productos por el nombre que coincida con la cadena especificada. Se pueden combinar ambos parámetros para realizar búsquedas más específicas. Esta operación devuelve una lista de productos en formato JSON. 
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de productos usando el ORM y se devuelve la lista de productos.
-====
-
-[source,python]
-----
-# Route to get all products
-@router.get("/", response_model=List[ProductResponse])
-async def get_products(categoryId: Optional[str] = None, name: Optional[str] = None, db: Session = Depends(get_db)):
-    query = db.query(ProductDB)
-    if categoryId:
-        query = query.filter(ProductDB.categoryId == categoryId)
-    if name:
-        query = query.filter(ProductDB.name.ilike(f"%{name}%"))
-    products = query.all()
-    return [ProductResponse(id=p.id, name=p.name, description=p.description, price=p.price, categoryId=p.categoryId) for p in products]
-----
-
-#### Endpoint para actualizar un producto
-
-Añade el siguiente código para definir un endpoint `PUT /api/products/{id}` que permite actualizar un producto por su ID. Este endpoint recibe el ID del producto como parámetro en la URL y los nuevos datos del producto en formato JSON en el cuerpo de la solicitud. Los datos del producto a actualizar deben incluir los campos `name`, `description`, `price` y `categoryId`. El endpoint actualiza el producto correspondiente en la tabla de productos de MySQL. Si el producto se actualiza correctamente, se devuelve un mensaje de éxito. Si el producto no se encuentra, se devuelve un mensaje de error.
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de productos usando el ORM, se actualizan los campos y se confirma la transacción para guardar los cambios en la base de datos.
-====
-
-[source,python]
-----
-# Route to update a product by ID
-@router.put("/{id}", response_model=ProductResponse)
-async def update_product(id: int, product: Product, db: Session = Depends(get_db)):
-    product_db = db.query(ProductDB).filter(ProductDB.id == id).first()
-    if not product_db:
-        raise HTTPException(status_code=404, detail="Product not found")
-    for key, value in product.dict().items():
-        setattr(product_db, key, value)
-    db.commit()
-    db.refresh(product_db)
-    return ProductResponse(id=product_db.id, **product.dict())
-----
-
-#### Endpoint para eliminar un producto
-
-Añade el siguiente código para definir un endpoint `DELETE /api/products/{id}` que permite eliminar un producto por su ID. Este endpoint recibe el ID del producto como parámetro en la URL y elimina el producto correspondiente de la tabla de productos de MySQL. También elimina los comentarios asociados al producto. Si el producto se elimina correctamente, se devuelve un mensaje de éxito. Si el producto no se encuentra, se devuelve un mensaje de error.
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de productos usando el ORM y se elimina el producto. Luego, se eliminan los comentarios asociados al producto.
-====
-
-[source,python]
-----
-# Route to delete a product by ID
-@router.delete("/{id}", status_code=200)
-async def delete_product(id: int, db: Session = Depends(get_db)):
-    product = db.query(ProductDB).filter(ProductDB.id == id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    db.delete(product)
-    # Delete associated reviews (including their comments)
-    from models import ReviewDB
-    db.query(ReviewDB).filter(ReviewDB.productId == id).delete()
-    db.commit()
-    return {"message": "Product and associated reviews deleted"}
-----
-
-### Endpoints de comentarios
-
-En esta sección, vamos a implementar los endpoints para gestionar comentarios en la API REST. Los endpoints incluyen la creación, consulta, actualización y eliminación de comentarios.
-
-En el archivo `routes/reviews.py` añade el siguiente código antes de la definición de las rutas de comentarios:
-
-[source,python]
-----
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.orm import Session
-from typing import List, Optional
-from datetime import datetime
-from models import Review, ReviewResponse, ReviewDB
-from database import get_db
-import pytz
-
-router = APIRouter()
-
-// Los endpoints de comentarios se definen aquí
-----
-
-#### Añadir el enrutado de comentarios a `main.py`
-
-Modificar el archivo `main.py` para incluir el enrutado de comentarios en la aplicación FastAPI. Se harán modificaciones para importar el router de comentarios y añadirlo a la aplicación con el prefijo `/api/reviews` y la etiqueta `reviews`.
-
-[source,python]
-----
-from fastapi import FastAPI
-from routes import test, users, categories, products, reviews   # Importar el router de comentarios
-from database import engine, Base
-from sqlalchemy import text
-
-# Crear tablas si no existen. Al usar SQLAlchemy, se crean todas las tablas definidas en los modelos que heredan de Base
-Base.metadata.create_all(bind=engine)
-
-# Crear tabla users si no existe
-with engine.connect() as conn:
-    conn.execute(text("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) NOT NULL UNIQUE,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    """))
-    conn.commit()
-
-app = FastAPI(
-    title="Products and Reviews API",
-    description="API for managing products and reviews using FastAPI and MySQL",
-    version="1.0.0"
-)
-
-app.include_router(test.router, prefix="/api/test", tags=["test"])
-app.include_router(users.router, prefix="/api/users", tags=["users"])
-app.include_router(categories.router, prefix="/api/categories", tags=["categories"])
-app.include_router(products.router, prefix="/api/products", tags=["products"])
-app.include_router(reviews.router, prefix="/api/reviews", tags=["reviews"])  # Añadir el router de comentarios
-----
-
-#### Endpoint para añadir un comentario a un producto
-
-Añade el siguiente código para definir un endpoint `POST /api/reviews` que permite añadir un comentario a un producto. Este endpoint recibe los datos del comentario en formato JSON en el cuerpo de la solicitud y los inserta en la tabla de comentarios de MySQL. En el cuerpo de la solicitud se deben proporcionar los siguientes campos: `productId`, `userId`, `username`, `rating` y `comment`. El endpoint devuelve un mensaje con el ID del nuevo comentario creado.
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se crea una instancia del modelo `ReviewDB` con los datos proporcionados y se añade a la sesión de la base de datos. Luego, se confirma la transacción para guardar los cambios en la base de datos.
-====
-
-[source,python]
-----
-# Route to create a new review
-@router.post("/", response_model=ReviewResponse, status_code=201)
-async def create_review(review: Review, db: Session = Depends(get_db)):
-    review_db = ReviewDB(**review.dict(), createdAt=datetime.now(pytz.UTC))
-    db.add(review_db)
-    db.commit()
-    db.refresh(review_db)
-    return ReviewResponse(id=review_db.id, createdAt=review_db.createdAt.strftime("%Y-%m-%dT%H:%M:%SZ"), **review.dict())
-----
-
-#### Endpoint para obtener los comentarios de un producto o por usuario
-
-Añade el siguiente código para definir un endpoint `GET /api/reviews` que permite obtener los comentarios de un producto o por usuario. Este endpoint admite parámetros de consulta opcionales para filtrar los comentarios por producto (`productId`) o por usuario (`userId`). Si se proporciona el parámetro `productId`, se filtran los comentarios por el producto especificado. Si se proporciona el parámetro `userId`, se filtran los comentarios por el usuario especificado. Se pueden combinar ambos parámetros para realizar búsquedas más específicas. Esta operación devuelve una lista de comentarios en formato JSON.
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de comentarios usando el ORM y se devuelve la lista de comentarios.
-====
-
-[source,python]
-----
-# Route to get all reviews or filter by productId or userId
-@router.get("/", response_model=List[ReviewResponse])
-async def get_reviews(productId: Optional[int] = None, userId: Optional[str] = None, db: Session = Depends(get_db)):
-    query = db.query(ReviewDB)
-    if productId:
-        query = query.filter(ReviewDB.productId == productId)
-    if userId:
-        query = query.filter(ReviewDB.userId == userId)
-    reviews = query.all()
-    return [ReviewResponse(id=r.id, productId=r.productId, userId=r.userId, username=r.username, rating=r.rating, comment=r.comment, createdAt=r.createdAt.strftime("%Y-%m-%dT%H:%M:%SZ"), updatedAt=r.updatedAt.strftime("%Y-%m-%dT%H:%M:%SZ") if r.updatedAt else None) for r in reviews]
-----
-
-#### Endpoint para actualizar un comentario
-
-Añade el siguiente código para definir un endpoint `PUT /api/reviews/{id}` que permite actualizar un comentario por su ID. Este endpoint recibe el ID del comentario como parámetro en la URL y los nuevos datos del comentario en formato JSON en el cuerpo de la solicitud. Los datos del comentario a actualizar deben incluir los campos `userId`, `rating` y `comment`. El endpoint actualiza el comentario correspondiente en la tabla de comentarios de MySQL. Como medida de seguridad se verifica que el usuario que intenta actualizar el comentario sea el mismo que lo creó. Si el comentario se actualiza correctamente, se devuelve un mensaje de éxito. Si el comentario no se encuentra, se devuelve un mensaje de error.
-
-[NOTE]
-====
-Como usamos SQLAlchemy, no es necesario escribir la consulta SQL directamente. En su lugar, se consulta la tabla de comentarios usando el ORM, se actualizan los campos y se confirma la transacción para guardar los cambios en la base de datos.
-====
-
-[source,python]
-----
-# Route to update a review by ID
-@router.put("/{id}", response_model=ReviewResponse)
-async def update_review(id: int, review: Review, db: Session = Depends(get_db)):
-    review_db = db.query(ReviewDB).filter(ReviewDB.id == id, ReviewDB.userId == review.userId).first()
-    if not review_db:
-        raise HTTPException(status_code=403, detail="You can only update your own reviews")
-    review_db.rating = review.rating
-    review_db.comment = review.comment
-    review_db.updatedAt = datetime.now(pytz.UTC)
-    db.commit()
-    db.refresh(review_db)
-    return ReviewResponse(id=review_db.id, productId=review_db.productId, userId=review_db.userId, username=review_db.username, rating=review_db.rating, comment=review_db.comment, createdAt=review_db.createdAt.strftime("%Y-%m-%dT%H:%M:%SZ"), updatedAt=review_db.updatedAt.strftime("%Y-%m-%dT%H:%M:%SZ"))
-----
-
-#### Endpoint para eliminar un comentario
-
-Añade el siguiente código para definir un endpoint `DELETE /api/reviews/{id}` que permite eliminar un comentario por su ID. Este endpoint recibe el ID del comentario como parámetro en la URL y elimina el comentario correspondiente de la tabla de comentarios de MySQL. Como medida de seguridad se verifica que el usuario que intenta eliminar el comentario sea el mismo que lo creó. Si el comentario se elimina correctamente, se devuelve un mensaje de éxito. Si el comentario no se encuentra, se devuelve un mensaje de error.
-
-[source,python]
-----
-# Route to delete a review by ID
-@router.delete("/{id}")
-async def delete_review(id: int, request_body: dict, db: Session = Depends(get_db)):
-    userId = request_body.get("userId")
-    if not userId:
-        raise HTTPException(status_code=400, detail="userId is required in request body")
-    review = db.query(ReviewDB).filter(ReviewDB.id == id, ReviewDB.userId == userId).first()
-    if not review:
-        raise HTTPException(status_code=403, detail="You can only delete your own reviews")
-    db.delete(review)
-    db.commit()
-    return {"message": "Review deleted"}
-----
+Si ahora queremos poder navegar de forma completa, podemos añadir enlaces HATEOAS adicionales en cada endpoint para permitir a los clientes descubrir fácilmente las operaciones relacionadas con cada recurso. Por ejemplo, en el endpoint `GET /products`, podríamos incluir enlaces a los endpoints de detalle de producto, actualización y eliminación para cada producto devuelto en la lista. Esto permitiría a los clientes navegar de manera intuitiva entre los recursos relacionados y realizar operaciones adicionales sobre los productos sin tener que conocer previamente la estructura de la API REST.
 
 ## Indices para mejorar el rendimiento
 
@@ -1183,14 +1442,6 @@ CREATE INDEX idx_categoryId ON products (categoryId);
 CREATE INDEX idx_name ON products (name);
 ----
 
-* **Indices para la tabla de categorías**
-    ** Indice en el campo `parentId` para construir la jerarquía de categorías:
-+
-[source, bash]
-----
-CREATE INDEX idx_parentId ON categories (parentId);
-----
-
 * **Indices para la tabla de comentarios**
     ** Indice en el campo `productId` para filtrar comentarios por producto:
 +
@@ -1205,107 +1456,148 @@ CREATE INDEX idx_productId ON reviews (productId);
 CREATE INDEX idx_userId ON reviews (userId);x
 ----
 
+[TIP]
+====
+Para ejecutar estos comandos SQL, puedes utilizar una herramienta de administración de bases de datos como MySQL Workbench conectada a localhost, que es donde el entorno Docker compose de este tutorial ejecuta la base de datos MySQL. Simplemente abre una nueva consulta en MySQL Workbench, copia y pega los comandos SQL para crear los índices, y ejecútalos para mejorar el rendimiento de las consultas en tu API REST. Las credenciales de conexión a la base de datos MySQL vendrán determinadas por los valores de las variables de entorno configuradas en el archivo `.env` de la carpeta `setup-environment`.
+====
+
 ## Pruebas de la API
 
 Una vez que hemos desarrollado la API REST con FastAPI, podemos probar los endpoints utilizando Postman. A continuación se muestran algunos ejemplos de peticiones a la API REST:
 
+[NOTE]
+====
+El repositorio cuenta con un script `api/create_data.sh` con un script bash para inicializar la base de datos. El script añade usuarios, categorías, productos y reseñas a modo de ejemplo.
+====
+
+* Crear un nuevo usuario:
+    - Método: `POST`
+    - URL: `http://localhost:8000/users`
+    - Cuerpo: `{"username": "ursula", "email": "ursula@acme.com"}`
+    - Respuesta esperada: `{
+        "username": "ursula",
+        "email": "ursula@acme.com",
+        "id": 1
+    }`
++
+image::postman-create-user.png[]
+
+* Obtener todos los usuarios:
+    - Método: `GET`
+    - URL: `http://localhost:8000/users`
+    - Respuesta esperada: Lista de usuarios en formato JSON
++
+image::postman-get-users.png[]
+
 * Crear una nueva categoría:
     - Método: `POST`
-    - URL: `http://localhost:8000/api/categories`
+    - URL: `http://localhost:8000/categories`
     - Cuerpo: `{"name": "Electrónica", "description": "Categoría de productos electrónicos", "parentId": null}`
     - Respuesta esperada: `{
         "name": "Electrónica",
         "description": "Categoría de productos electrónicos",
         "parentId": null,
-        "id": "67e1a445567da5eeb6d61a2d"
-        }`
+        "id": 1
+    }`
 +
-image::images/postman-create-category.png[]
+image::postman-create-category.png[]
+
 * Obtener todas las categorías:
     - Método: `GET`
-    - URL: `http://localhost:8000/api/categories`
+    - URL: `http://localhost:8000/categories`
     - Respuesta esperada: Lista de categorías en formato JSON
 +
-image::images/postman-get-categories.png[]
+image::postman-get-categories.png[]
+
 * Crear un nuevo producto:
     - Método: `POST`
-    - URL: `http://localhost:8000/api/products`
-    - Cuerpo: `{"name": "Smartphone", "description": "Teléfono inteligente", "price": 500, "categoryId": "67e1a445567da5eeb6d61a2d"}`
-    - Respuesta esperada: `{
-        "name": "Smartphone",
-        "description": "Teléfono inteligente",
-        "price": 500.0,
-        "categoryId": "67e1a445567da5eeb6d61a2d",
-        "id": "67e1a595567da5eeb6d61a2f"
+    - URL: `http://localhost:8000/products`
+    - Cuerpo: `{
+        "name": "Laptop Dell",
+        "description": "Laptop potente para trabajo",
+        "price": 1200.0,
+        "categoryId": "1"
     }`
+    - Respuesta esperada: `{
+        "name": "Laptop Dell",
+        "description": "Laptop potente para trabajo",
+        "price": 1200.0,
+        "categoryId": 1,
+        "id": 1
+    }`
++
+image::postman-create-product.png[]
 * Obtener todos los productos de una categoría:
     - Método: `GET`
-    - URL: `http://localhost:8000/api/products?categoryId=67e1a445567da5eeb6d61a2d`
+    - URL: `http://localhost:8000/products?categoryId=1`
     - Respuesta esperada: Lista de productos en formato JSON
 +
-image::images/postman-get-products.png[]
+image::postman-get-products.png[]
 * Añadir un comentario a un producto:
     - Método: `POST`
-    - URL: `http://localhost:8000/api/reviews`
-    - Cuerpo: `{"productId": "67e1a595567da5eeb6d61a2f", "userId": "60c72b2f9b1d8b3a4c8b4569", "username": "usuario123", "rating": 4.5, "comment": "Muy buen producto, la batería dura bastante."}`
+    - URL: `http://localhost:8000/reviews`
+    - Cuerpo: `{
+        "rating": 5,
+        "comment": "Excelente laptop, muy rápida",
+        "productId": 1,
+        "userId": 1
+    }`
     - Respuesta esperada: `{
-        "productId": "67e1a595567da5eeb6d61a2f",
-        "userId": "60c72b2f9b1d8b3a4c8b4569",
-        "username": "usuario123",
-        "rating": 4.5,
-        "comment": "Muy buen producto, la batería dura bastante.",
-        "id": "67e1a672567da5eeb6d61a30",
-        "createdAt": "2025-03-24T18:37:38Z",
-        "updatedAt": null
+        "productId": 1,
+        "userId": 1,
+        "rating": 5.0,
+        "comment": "Excelente laptop, muy rápida",
+        "id": 1
     }`
 +
-image::images/postman-add-review.png[]
+image::postman-add-review.png[]
 * Obtener los comentarios de un producto:
     - Método: `GET`
-    - URL: `http://localhost:8000/api/reviews?productId=67e1a595567da5eeb6d61a2f`
+    - URL: `http://localhost:8000/reviews?productId=1`
     - Respuesta esperada: Lista de comentarios en formato JSON
 * Actualizar un comentario:
     - Método: `PUT`
-    - URL: `http://localhost:8000/api/reviews/67e1a672567da5eeb6d61a30`
+    - URL: `http://localhost:8000/reviews/1`
     - Cuerpo: `{
-        "productId": "67e1a595567da5eeb6d61a2f",
-        "userId": "60c72b2f9b1d8b3a4c8b4569",
-        "username": "usuario123",
+        "productId": 1,
+        "userId": 1,
         "rating": 4.0,
         "comment": "Muy buen producto, la batería dura bastante."
     }`
     - Respuesta esperada: `{
-        "productId": "67e1a595567da5eeb6d61a2f",
-        "userId": "60c72b2f9b1d8b3a4c8b4569",
-        "username": "usuario123",
+        "productId": 1,
+        "userId": 1,
         "rating": 4.0,
         "comment": "Muy buen producto, la batería dura bastante.",
-        "id": "67e1a6fa567da5eeb6d61a31",
-        "createdAt": "2025-03-24T18:39:54Z",
-        "updatedAt": "2025-03-24T18:42:32Z"
+        "id": 1
     }`
 +
-image::images/postman-update-review.png[]
+image::postman-update-review.png[]
 * Eliminar un comentario:
     - Método: `DELETE`
-    - URL: `http://localhost:8000/api/reviews/67e1a672567da5eeb6d61a30`
-    - Respuesta esperada: `{
-        "message": "Review deleted"
-    }`
+    - URL: `http://localhost:8000/reviews/1`
+    - Respuesta esperada: Devolverá un código de estado 204 (No Content) sin contenido en la respuesta, lo que indica que la operación se realizó correctamente.
 +
 image::images/postman-delete-review.png[]
 * Eliminar un producto:
     - Método: `DELETE`
-    - URL: `http://localhost:8000/api/products/67e1a595567da5eeb6d61a2f`
-    - Respuesta esperada: `{"message": "Product and associated reviews deleted"}`
+    - URL: `http://localhost:8000/products/67e1a595567da5eeb6d61a2f`
+    - Respuesta esperada: Devolverá un código de estado 204 (No Content) sin contenido en la respuesta, lo que indica que la operación se realizó correctamente.
 +
-image::images/postman-delete-product.png[]
+image::postman-delete-product.png[]
++
+[NOTE]
+====
+Como la tabla de comentarios tiene una FOREIGN KEY que hace referencia a la tabla de productos, al eliminar un producto se eliminarán automáticamente todos los comentarios asociados a ese producto debido a la cláusula `ON DELETE CASCADE` definida en la base de datos. Esto garantiza que no queden comentarios huérfanos en la base de datos después de eliminar un producto.
+====
++
+image::postman-delete-product-cascade.png[]
 * Eliminar una categoría:
     - Método: `DELETE`
-    - URL: `http://localhost:8000/api/categories/67e1a445567da5eeb6d61a2d`
-    - Respuesta esperada: `{"message": "Category deleted"}`
+    - URL: `http://localhost:8000/categories/1`
+    - Respuesta esperada: Devolverá un código de estado 204 (No Content) sin contenido en la respuesta, lo que indica que la operación se realizó correctamente. Al eliminar una categoría, no se eliminarán automáticamente los productos asociados a esa categoría, ya que la tabla de productos tiene una FOREIGN KEY con `ON DELETE SET NULL` que establece el campo `categoryId` a `NULL` en lugar de eliminar los productos. Esto permite conservar los productos incluso si su categoría es eliminada, aunque quedarán sin categoría asignada.
 +
-image::images/postman-delete-category.png[]
+image::postman-delete-category-cascade.png[]
 
 ## Documentación de la API
 
@@ -1315,11 +1607,11 @@ FastAPI utiliza Swagger UI y ReDoc para generar la documentación de la API. Swa
 
 Para acceder a la documentación de la API, abre un navegador web y navega a la URL `http://localhost:8000/docs` para Swagger UI o `http://localhost:8000/redoc` para ReDoc. A continuación se muestra la documentación de la API generada automáticamente para Swagger UI.
 
-image::images/swagger-ui-finished.png[]
+image::swagger-ui-finished.png[]
 
 A continuación se muestra la documentación de la API generada automáticamente para ReDoc.
 
-image::images/redoc-finished.png[]
+image::redoc-finished.png[]
 
 ## Conclusiones
 
@@ -1327,14 +1619,51 @@ En este tutorial, se ha desarrollado una API REST para la gestión de usuarios, 
 
 MySQL es una excelente opción para almacenar datos estructurados, como se ha observado en los usuarios, productos, categorías y comentarios. La combinación de FastAPI y MySQL permite desarrollar aplicaciones web rápidas y eficientes con una arquitectura RESTful. Además, las características de validación de datos de Pydantic y la generación automática de documentación de FastAPI facilitan el desarrollo y la documentación de la API.
 
+En este tutorial, la interacción con la base de datos se ha realizado directamente mediante sentencias SQL, lo que proporciona un control total sobre las consultas y la estructura de la base de datos. Sin embargo, también se podría considerar el uso de un ORM (Object-Relational Mapping) como SQLAlchemy para abstraer la interacción con la base de datos y facilitar el desarrollo de la API REST. SQLAlchemy permite definir modelos de datos como clases de Python y utilizar métodos para realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) en lugar de escribir consultas SQL directamente. Esto puede mejorar la legibilidad del código y facilitar el mantenimiento a largo plazo de la aplicación. Sin embargo, en este tutorial se ha optado por utilizar sentencias SQL directas para proporcionar una comprensión más clara de cómo interactuar con la base de datos MySQL y para mantener el enfoque en el desarrollo de la API REST con FastAPI.
+
 Este proyecto no sólo proporciona una solución funcional para la gestión de productos, categorías y comentarios, sino que también sirve como punto de partida para desarrollar aplicaciones web más complejas y escalables. Se pueden añadir más funcionalidades a la API, como la autenticación de usuarios, la gestión de pedidos y la integración con pasarelas de pago.
 
 :numbered!:
+
+## Anexo. Instrucciones de instalación
+
+Para instalar y ejecutar la aplicación, sigue estos pasos:
+
+. Clona el repositorio:
++
+```bash
+git clone https://github.com/ualmtorres/FastAPIMySQLAPIProductosValoraciones.git
+cd FastAPIMySQLAPIProductosValoraciones
+```
+. Ejecuta Docker Compose para levantar los servicios:
++
+```bash
+docker-compose up -d
+```
++
+[NOTE]
+====
+Si necesitas volver a construir las imágenes de Docker (por ejemplo, si has realizado cambios en el archivo `Dockerfile`), puedes usar el siguiente comando:
+```bash
+docker-compose up -d --build
+```
+====
+. Inicializa la base de datos con datos de prueba ejecutando el script `api/create_data.sh` que realiza llamadas a la API REST.
+. Accede a la documentación de la API REST en `http://localhost:8000/docs` (Swagger) o `http://localhost:8000/redoc` (Redoc).
+. Accede a los endpoints de la API REST en `http://localhost:8000`.
+. Acceder a la aplicación de gestión en `http://localhost`.
+. Para detener los servicios, ejecuta el siguiente comando:
++
+```bash
+docker-compose down
+```
+
+Con estos pasos, tendrás el entorno de desarrollo configurado y funcionando la API REST y la aplicación de gestión.
 
 ## Licencia
 
 Licencia CC BY-NC-ND 4.0
 
-Copyright (c) 2025 [Manuel Torres - Departamento de Informática - Universidad de Almería]
+Copyright (c) 2026 [Manuel Torres - Departamento de Informática - Universidad de Almería]
 
 Este proyecto está licenciado bajo la Licencia CC BY-NC-ND 4.0. Esto significa que puedes compartir el proyecto siempre que cites al autor, no lo uses para fines comerciales y no realices obras derivadas.
