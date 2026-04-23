@@ -41,7 +41,11 @@ COLOCA A CONTINUACION LOS OBJETIVOS
 
 [TIP]
 ====
-Disponible el https://github.com/ualmtorres/FastAPIMySQLAPIProductosValoraciones.git[repositorio de GitHub] con el código fuente de la API REST. En el <<Anexo. Instrucciones de instalación>> se muestra cómo clonar el repositorio y configurar el entorno de desarrollo para ejecutar la API REST.
+Disponibles:
+
+* el https://github.com/ualmtorres/FastAPIMySQLAPIProductos.git[repositorio de GitHub] con el código fuente de la API REST usado en este tutorial
+* https://github.com/ualmtorres/fastapi-mysql-base-rest-api[reositorio] con proyecto base. Sólo contiene la configuración de FastAPI y MySQL con Docker y Docker Compose. No contiene la implementación de la API REST ni el código fuente de la aplicación. Sólo contiene un endpoint `health` para comprobar que la API ha conseguido arrancar. Usa este repositorio para seguir el tutorial desde cero.
+* En el <<Anexo. Instrucciones de instalación>> se muestra cómo clonar el repositorio y configurar el entorno de desarrollo para ejecutar la API REST.
 ====
 
 [NOTE]
